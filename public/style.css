@@ -1,3 +1,42 @@
+/* --- Navbar Box --- */
+.navbar {
+  background-color: #081728; /* The sleek dark blue from Figma */
+  display: flex; /* Puts Logo on the left, Links on the right */
+  justify-content: space-between;
+  align-items: center; /* Centers them vertically */
+  padding: 20px 50px; /* Adds breathing room inside the dark bar */
+}
+
+/* --- The Logo --- */
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+/* --- The Links Container --- */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 30px; /* Puts a nice gap between Register and Login */
+}
+
+/* --- Register Text --- */
+.register-link {
+  color: white;
+  text-decoration: none; /* Removes the default blue underline */
+  font-weight: 500;
+}
+
+/* --- Login Button --- */
+.login-btn {
+  background-color: #21a1f1; /* The light blue button color */
+  color: white;
+  padding: 10px 24px;
+  border-radius: 6px; /* Rounds the edges */
+  text-decoration: none;
+  font-weight: bold;
+}
 /* --- Main Hero Section --- */
 .hero {
   padding: 20px 50px; /* Pushes the content down from the navbar */
@@ -171,4 +210,272 @@ h1 {
   font-size: 14px;
   color: #333;
   word-break: break-all; /* Forces the giant 64-character hash to wrap if screen is small */
+}
+
+/* --- Logo Banner Section --- */
+.logo-banner {
+  background-color: #f8f9fa; /* The light gray background */
+  padding: 40px 0; /* 40px padding top and bottom, 0 on the sides */
+  text-align: center; /* Centers the title text */
+  margin-top: 40px; /* Pushes it down slightly from the Hero section */
+}
+
+.banner-title {
+  font-size: 12px;
+  color: #777;
+  font-weight: 700;
+  letter-spacing: 1px; /* Spreads the letters out slightly for a premium look */
+  margin-bottom: 25px;
+}
+
+.logo-track {
+  display: flex; /* Puts all the logos in a single horizontal row */
+  justify-content: center; /* Centers the row of logos in the middle of the screen */
+  gap: 50px; /* Adds 50px of space between each logo */
+  flex-wrap: wrap; /* If the screen is too small, this lets them wrap to the next line safely */
+}
+
+.logo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.logo-icon {
+  font-size: 20px;
+  color: #999;
+}
+
+/* --- State Cards Section --- */
+.states-section {
+  display: flex; /* Puts the 4 cards in a row */
+  gap: 20px; /* Space between each card */
+  max-width: 1300px; /* Matches the width of your hero section */
+  margin: 60px auto; /* Adds space on top/bottom, and centers the group */
+  padding: 0 50px;
+}
+
+.state-card {
+  background: white;
+  border: 1px solid #eaeaea; /* Very light gray outline */
+  border-radius: 12px; /* Smooth rounded corners */
+  padding: 40px 30px; /* Space inside the card */
+  flex: 1; /* MAGIC TRICK: Forces all 4 cards to be exactly the same width */
+}
+
+.state-card h2 {
+  color: #1a1b7f; /* Deep navy blue */
+  font-size: 36px; /* Makes the state name massive */
+  font-weight: 900; /* Extra bold */
+  margin-bottom: 20px; /* Pushes the small text down */
+}
+
+.state-card p {
+  color: #777; /* Light gray */
+  font-size: 13px;
+  line-height: 1.6; /* Adds space between the two lines of text */
+}
+
+/* --- Category Cards Section --- */
+.categories-section {
+  display: flex;
+  gap: 30px;
+  max-width: 1300px;
+  margin: 0 auto 100px auto; /* 100px margin at the bottom so the page doesn't abruptly end */
+  padding: 0 50px;
+}
+
+.category-card {
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  flex: 1; /* Makes all 3 cards equal width */
+  display: flex;
+  flex-direction: column; /* Stacks the image, content, and footer vertically */
+  overflow: hidden; /* Prevents the top images from breaking the rounded corners */
+}
+
+/* Image Placeholders */
+.card-img {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+/* Text Content Area */
+.card-content {
+  padding: 25px;
+  flex-grow: 1; /* Pushes the footer all the way to the bottom */
+}
+
+.badge {
+  background-color: #e8f5fd;
+  color: #21a1f1;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.category-card h3 {
+  color: #1a1a1a;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+/* Footer Section */
+.card-footer {
+  border-top: 1px solid #eaeaea; /* Light line separating the footer */
+  padding: 15px 25px;
+  color: #999;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* --- How It Works Section --- */
+.method-section {
+  max-width: 1100px; /* Slightly narrower than the hero section to keep text readable */
+  margin: 80px auto; /* 80px space on top/bottom, auto centers it */
+  padding: 0 50px;
+  text-align: center; /* Centers the main title */
+}
+
+.method-title {
+  color: #111a28; /* Deep dark blue */
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 60px; /* Big gap before the steps start */
+}
+
+/* The Row of Steps */
+.method-steps {
+  display: flex; /* Puts the 3 steps in a row */
+  gap: 40px; /* Space between each step */
+  text-align: left; /* Forces the text inside the steps back to the left */
+}
+
+.step-card {
+  flex: 1; /* Divides the space perfectly into 3 equal columns */
+}
+
+/* The Blue Circles */
+.step-number {
+  background-color: #e8f5fd; /* Light blue background */
+  color: #21a1f1; /* Bright blue text */
+  width: 55px;
+  height: 55px;
+  border-radius: 50%; /* Magic trick: turns a square into a perfect circle */
+  display: flex;
+  align-items: center; /* Vertically centers the number inside the circle */
+  justify-content: center; /* Horizontally centers the number inside the circle */
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 20px; /* Space below the circle */
+}
+
+.step-card h3 {
+  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.step-card p {
+  color: #777;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* --- About Us Section --- */
+.about-section {
+  display: flex; /* Splits the section into left/right columns */
+  align-items: center; /* Vertically centers the text with the image */
+  gap: 100px;
+  max-width: 1200px;
+  margin: 80px auto;
+  padding: 60px 50px;
+  background-color: #fafbfc; /* A very subtle off-white/gray background */
+  border-radius: 20px;
+}
+
+.about-content {
+  flex: 1;
+}
+.about-image {
+  flex: 1.2;
+} /* Gives the image slightly more space than the text */
+
+.about-title {
+  font-size: 36px;
+  font-weight: 900;
+  color: #111a28;
+  margin-bottom: 15px;
+}
+
+.about-description {
+  color: #555;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+/* Feature List Styling */
+.about-features {
+  display: flex;
+  flex-direction: column; /* Stacks the three features vertically */
+  gap: 25px;
+}
+
+.feature-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start; /* Aligns the blue circle with the top of the text */
+}
+
+/* The Solid Blue Checkmark Circle */
+.feature-icon {
+  background-color: #21a1f1;
+  color: white;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  flex-shrink: 0; /* Crucial: Prevents the circle from squishing if the text gets too long! */
+}
+
+.feature-text h4 {
+  color: #111a28;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.feature-text p {
+  color: #777;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* The Image Box Shadow */
+/* Real Sandbox Image Styling */
+.sandbox-img {
+  width: 100%;
+  height: 350px; /* Forces the image to be tall like the Figma design */
+  object-fit: cover; /* MAGIC TRICK: Fills the box perfectly without squishing */
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  display: block;
 }
