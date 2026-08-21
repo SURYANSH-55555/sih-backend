@@ -1,0 +1,69 @@
+/* --- Main Hero Section --- */
+.hero {
+    padding: 20px 50px;       /* Pushes the content down from the navbar */
+    max-width: 1300px;        /* Stops it from stretching too wide on giant screens */
+    margin: 0 auto;           /* Centers this giant box in the middle of the screen */
+}
+
+/* Left Side Text */
+h1 {
+    font-size: 64px;          /* Makes the text massive */
+    line-height: 1.1;         /* Squeezes the top and bottom lines slightly closer */
+    margin-bottom: 20px;      /* Adds breathing room below the title */
+    color: #1a1a1a;           /* Almost black */
+}
+
+.highlight {
+    color: #21a1f1;           /* Paints "Spot fakes" blue */
+}
+
+.subtitle {
+    font-size: 20px;
+    color: #555;              /* Dark grey */
+    margin-bottom: 40px;      /* Pushes the buttons further down */
+}
+
+/* Buttons */
+.cta-group {
+    display: flex;            /* Puts blue button and empty box side-by-side */
+    gap: 15px;                /* Space between them */
+    margin-bottom: 40px;      /* Pushes the checkmarks further down */
+}
+
+.explore-btn {
+    background-color: #1c6b8c; /* Darker blue for the main button */
+    color: white;
+    padding: 14px 28px;       /* Makes the button thick and clickable */
+    border: none;             /* Removes the ugly default browser border */
+    border-radius: 8px;       /* Rounds the corners */
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;          /* Turns your mouse into a pointing hand when hovering */
+}
+
+.empty-box {
+    border: 1px solid #ddd;   /* Creates a light grey outline */
+    border-radius: 8px;
+    width: 150px;             /* Forces it to be wide like the Figma design */
+    background: #fafafa;
+}
+
+/* Checkmarks */
+.features {
+    display: flex;            /* Puts the three text items side-by-side */
+    gap: 20px;
+    color: #555;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;      /* Vertically aligns the checkmark icon with the text */
+    gap: 8px;                 /* Tiny space between the checkmark and the words */
+}
+
+.checkmark {
+    color: #21a1f1;           /* Paints just the checkmark blue */
+    font-weight: bold;
+}
