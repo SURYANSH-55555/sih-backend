@@ -479,3 +479,230 @@ h1 {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   display: block;
 }
+
+/* --- Testimonials Section --- */
+.testimonials-section {
+  max-width: 1200px;
+  margin: 100px auto;
+  padding: 0 50px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111a28;
+  margin-bottom: 50px;
+}
+
+.testimonials-grid {
+  display: flex;
+  gap: 30px;
+}
+
+.testimonial-card {
+  flex: 1;
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 35px 30px;
+  text-align: left; /* Forces text inside the card back to the left */
+}
+
+.stars {
+  color: #f59e0b; /* The nice gold/orange color */
+  font-size: 18px;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.quote {
+  color: #555;
+  font-size: 14px;
+  font-style: italic; /* Makes the text italicized like a real quote */
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+/* Author Area at the bottom of the card */
+.author {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%; /* Perfect circle for the profile picture */
+}
+
+.author-info h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111a28;
+  margin-bottom: 3px;
+}
+
+.author-info p {
+  font-size: 11px;
+  color: #777;
+}
+
+/* --- Dark CTA Banner --- */
+.cta-banner {
+  background-color: #111a28; /* Deep navy dark theme */
+  max-width: 1100px;
+  margin: 0 auto 80px auto;
+  border-radius: 20px;
+  padding: 60px 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  color: white;
+}
+
+.cta-banner-content h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.cta-banner-content p {
+  color: #94a3b8;
+  font-size: 14px;
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+.cta-banner-form {
+  display: flex;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 6px;
+  gap: 10px;
+}
+
+.cta-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 10px 15px;
+  color: white;
+  font-size: 14px;
+  width: 240px;
+}
+
+.cta-input::placeholder {
+  color: #64748b;
+}
+
+.cta-subscribe-btn {
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.cta-subscribe-btn:hover {
+  opacity: 0.9;
+}
+
+/* --- Footer Section --- */
+.footer-section {
+  background-color: #081728; /* Darker navy blue footer */
+  color: #94a3b8;
+  padding: 80px 50px 40px 50px;
+}
+
+.footer-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  padding-bottom: 60px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-col.brand-col {
+  flex: 1.5;
+}
+
+.footer-logo {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.footer-col.brand-col p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+.footer-col {
+  flex: 1;
+}
+
+.footer-col h4 {
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-col ul li a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.footer-col ul li a:hover {
+  color: white;
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 40px auto 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.footer-bottom-links {
+  display: flex;
+  gap: 25px;
+}
+
+.footer-bottom-links a {
+  color: #64748b;
+  text-decoration: none;
+}
+
+.footer-bottom-links a:hover {
+  color: white;
+}
