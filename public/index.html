@@ -14,33 +14,89 @@
     </nav>
     <!-- MAIN HERO SECTION -->
     <div class="hero">
-        
-        <!-- LEFT SIDE: Text and Buttons -->
-        <div class="hero-left">
-            
-            <!-- 1. The Big Title -->
-            <h1>Verify documentation.<br>
-                <span class="highlight">Spot fakes</span> seamlessly.
-            </h1>
-            
-            <!-- 2. The Subtitle -->
-            <p class="subtitle">Access thousands of certificates - academics and co-curricular</p>
-            
-            <!-- 3. The Buttons -->
-            <div class="cta-group">
-                <button class="explore-btn">Explore Colleges ➔</button>
-                <div class="empty-box"></div>
-            </div>
+      <!-- LEFT SIDE: Text and Buttons -->
+      <div class="hero-left">
+        <!-- 1. The Big Title -->
+        <h1>
+          Verify documentation.<br />
+          <span class="highlight">Spot fakes</span> seamlessly.
+        </h1>
 
-            <!-- 4. The Checkmarks -->
-            <div class="features">
-                <div class="feature-item"><span class="checkmark">✔</span> 2,500+ Certified Colleges</div>
-                <div class="feature-item"><span class="checkmark">✔</span> Verification made basic</div>
-                <div class="feature-item"><span class="checkmark">✔</span> Secure and Accurate</div>
-            </div>
+        <!-- 2. The Subtitle -->
+        <p class="subtitle">
+          Access thousands of certificates - academics and co-curricular
+        </p>
 
+        <!-- 3. The Buttons -->
+        <div class="cta-group">
+          <button class="explore-btn" id="hashBtn">Generate Hash ➔</button>
+          <div class="empty-box"></div>
         </div>
 
+        <div id="hashDisplay" class="hash-result-box">
+          Click the button to generate secure hash...
+        </div>
+
+        <!-- 4. The Checkmarks -->
+        <div class="features">
+          <div class="feature-item">
+            <span class="checkmark">✔</span> 2,500+ Certified Colleges
+          </div>
+          <div class="feature-item">
+            <span class="checkmark">✔</span> Verification made basic
+          </div>
+          <div class="feature-item">
+            <span class="checkmark">✔</span> Secure and Accurate
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT SIDE: Dashboard Mockup -->
+      <div class="hero-right">
+        <!-- 1. The outer dashed box -->
+        <div class="mockup-container">
+          <!-- 2. The fake browser top bar -->
+          <div class="browser-header">
+            <div class="dots">
+              <div class="dot red"></div>
+              <div class="dot yellow"></div>
+              <div class="dot green"></div>
+            </div>
+            <div class="url-bar">eduverse.io/dashboard</div>
+          </div>
+
+          <!-- 3. The dark image placeholder -->
+          <div class="dashboard-img">[ Dashboard Image Goes Here ]</div>
+
+          <!-- 4. The two white stat cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-title">Total Students</div>
+              <div class="stat-value">12323432</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Colleges</div>
+              <div class="stat-value">14 Paths</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+    <script>
+      const button = document.getElementById("hashBtn");
+
+      // 1. We also need to find our new display box in the HTML tree
+      const displayBox = document.getElementById("hashDisplay");
+
+      button.addEventListener("click", async function () {
+        // Show a loading message so the user knows it's working
+        displayBox.innerText = "Generating secure hash...";
+
+        const response = await fetch("http://localhost:3000/test-hash");
+        const data = await response.json();
+
+        // 2. Instead of an alert, we inject the hash directly into the HTML box!
+        displayBox.innerText = "Verified Hash: " + data.sha256_hash;
+      });
+    </script>
   </body>
 </html>

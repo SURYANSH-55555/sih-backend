@@ -1,69 +1,174 @@
 /* --- Main Hero Section --- */
 .hero {
-    padding: 20px 50px;       /* Pushes the content down from the navbar */
-    max-width: 1300px;        /* Stops it from stretching too wide on giant screens */
-    margin: 0 auto;           /* Centers this giant box in the middle of the screen */
+  padding: 20px 50px; /* Pushes the content down from the navbar */
+  max-width: 1300px; /* Stops it from stretching too wide on giant screens */
+  margin: 0 auto; /* Centers this giant box in the middle of the screen */
 }
 
 /* Left Side Text */
 h1 {
-    font-size: 64px;          /* Makes the text massive */
-    line-height: 1.1;         /* Squeezes the top and bottom lines slightly closer */
-    margin-bottom: 20px;      /* Adds breathing room below the title */
-    color: #1a1a1a;           /* Almost black */
+  font-size: 64px; /* Makes the text massive */
+  line-height: 1.1; /* Squeezes the top and bottom lines slightly closer */
+  margin-bottom: 20px; /* Adds breathing room below the title */
+  color: #1a1a1a; /* Almost black */
 }
 
 .highlight {
-    color: #21a1f1;           /* Paints "Spot fakes" blue */
+  color: #21a1f1; /* Paints "Spot fakes" blue */
 }
 
 .subtitle {
-    font-size: 20px;
-    color: #555;              /* Dark grey */
-    margin-bottom: 40px;      /* Pushes the buttons further down */
+  font-size: 20px;
+  color: #555; /* Dark grey */
+  margin-bottom: 40px; /* Pushes the buttons further down */
 }
 
 /* Buttons */
 .cta-group {
-    display: flex;            /* Puts blue button and empty box side-by-side */
-    gap: 15px;                /* Space between them */
-    margin-bottom: 40px;      /* Pushes the checkmarks further down */
+  display: flex; /* Puts blue button and empty box side-by-side */
+  gap: 15px; /* Space between them */
+  margin-bottom: 40px; /* Pushes the checkmarks further down */
 }
 
 .explore-btn {
-    background-color: #1c6b8c; /* Darker blue for the main button */
-    color: white;
-    padding: 14px 28px;       /* Makes the button thick and clickable */
-    border: none;             /* Removes the ugly default browser border */
-    border-radius: 8px;       /* Rounds the corners */
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;          /* Turns your mouse into a pointing hand when hovering */
+  background-color: #1c6b8c; /* Darker blue for the main button */
+  color: white;
+  padding: 14px 28px; /* Makes the button thick and clickable */
+  border: none; /* Removes the ugly default browser border */
+  border-radius: 8px; /* Rounds the corners */
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer; /* Turns your mouse into a pointing hand when hovering */
 }
 
 .empty-box {
-    border: 1px solid #ddd;   /* Creates a light grey outline */
-    border-radius: 8px;
-    width: 150px;             /* Forces it to be wide like the Figma design */
-    background: #fafafa;
+  border: 1px solid #ddd; /* Creates a light grey outline */
+  border-radius: 8px;
+  width: 150px; /* Forces it to be wide like the Figma design */
+  background: #fafafa;
 }
 
 /* Checkmarks */
 .features {
-    display: flex;            /* Puts the three text items side-by-side */
-    gap: 20px;
-    color: #555;
-    font-size: 14px;
-    font-weight: 500;
+  display: flex; /* Puts the three text items side-by-side */
+  gap: 20px;
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .feature-item {
-    display: flex;
-    align-items: center;      /* Vertically aligns the checkmark icon with the text */
-    gap: 8px;                 /* Tiny space between the checkmark and the words */
+  display: flex;
+  align-items: center; /* Vertically aligns the checkmark icon with the text */
+  gap: 8px; /* Tiny space between the checkmark and the words */
 }
 
 .checkmark {
-    color: #21a1f1;           /* Paints just the checkmark blue */
-    font-weight: bold;
+  color: #21a1f1; /* Paints just the checkmark blue */
+  font-weight: bold;
+}
+
+/* --- Snap Left & Right Side-by-Side --- */
+.hero {
+  display: flex; /* Turns the main hero box into a row */
+  gap: 60px; /* Space between the left text and right mockup */
+  align-items: center; /* Vertically centers everything */
+}
+.hero-left {
+  flex: 1.2;
+} /* Text gets slightly more space */
+.hero-right {
+  flex: 1;
+} /* Image gets slightly less space */
+
+/* --- Right Side Mockup Styling --- */
+.mockup-container {
+  border: 1px dashed #21a1f1;
+  border-radius: 12px;
+  padding: 25px;
+  background: white;
+}
+
+/* 1. Browser Header & Mac Dots */
+.browser-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.dots {
+  display: flex;
+  gap: 6px;
+}
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+} /* border-radius: 50% makes a perfect circle */
+.dot.red {
+  background: #ff5f56;
+}
+.dot.yellow {
+  background: #ffbd2e;
+}
+.dot.green {
+  background: #27c93f;
+}
+
+.url-bar {
+  background: #e9ecef;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #21a1f1;
+  font-weight: bold;
+}
+
+/* 2. Dashboard Placeholder Box */
+.dashboard-img {
+  background: #d3d3d3;
+  height: 250px; /* Forces the box to be tall like an image */
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-weight: bold;
+}
+
+/* 3. Bottom Stat Cards */
+.stats-grid {
+  display: flex;
+  gap: 20px;
+}
+.stat-card {
+  flex: 1; /* Makes both cards exactly the same width */
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); /* Adds a tiny shadow for 3D depth */
+}
+.stat-title {
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+/* Styling for the Hash Result */
+.hash-result-box {
+  margin-bottom: 40px; /* Matches the spacing of the other elements */
+  padding: 15px;
+  background-color: #f1f8fc; /* Very light blue */
+  border-left: 4px solid #21a1f1; /* A thick blue line on the left side */
+  font-family: monospace; /* Makes it look like coding text */
+  font-size: 14px;
+  color: #333;
+  word-break: break-all; /* Forces the giant 64-character hash to wrap if screen is small */
 }
