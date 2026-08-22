@@ -1,0 +1,7 @@
+<!-- views/partials/topbar.ejs -->
+<div class="nav-pills">
+    <a href="/dashboard" class="pill <%= activePage === 'overview' ? 'active' : '' %>">Overview</a>
+    <a href="/dashboard/issue" class="pill <%= activePage === 'issue' ? 'active' : '' %>">Issue & Verify</a>
+    <a href="/dashboard/verify" class="pill <%= activePage === 'verify' ? 'active' : '' %>">Verification Profile</a>
+    <a href="/dashboard/revoke" class="pill <%= activePage === 'revoke' ? 'active' : '' %>">Revocation Registry</a>
+</div>

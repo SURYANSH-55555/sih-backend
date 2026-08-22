@@ -72,26 +72,7 @@
         font-size: 0.9rem;
       }
 
-      .tab-container {
-        display: flex;
-        background-color: #172233;
-        padding: 4px;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-      }
-
-      .tab-btn {
-        flex: 1;
-        border: none;
-        background: transparent;
-        color: #94a3b8;
-        font-size: 0.9rem;
-        font-weight: 600;
-        padding: 10px 0;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
+      
 
       .tab-btn.active {
         background-color: #223249;
@@ -219,26 +200,13 @@
         <p>Enter your credentials to access your dashboard</p>
       </div>
 
-      <div class="tab-container">
-        <button
-          class="tab-btn active"
-          id="btn-student"
-          onclick="setRole('student')"
-        >
-          For Students
-        </button>
-        <button class="tab-btn" id="btn-educator" onclick="setRole('educator')">
-          For Educators
-        </button>
-      </div>
-
       <form onsubmit="event.preventDefault()">
         <div class="input-group">
           <label for="login-id">Login ID</label>
           <input
             type="text"
             id="login-id"
-            placeholder="Enter your student or teacher ID"
+            placeholder="Enter your student ID"
             required
           />
         </div>

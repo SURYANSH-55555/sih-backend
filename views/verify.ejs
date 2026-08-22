@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduVerse | Verification Profile</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body class="dashboard-body">
+
+    <%- include('partials/sidebar') %>
+
+        <div class="dashboard-content">
+            <%- include('partials/topbar') %>
+
+                <div class="page-header">
+                    <h1>Verification Profile</h1>
+                    <p>The verified credential a recruiter sees after scanning.</p>
+                </div>
+
+                <div class="verify-grid">
+
+                    <!-- LEFT COLUMN: Scanner, QR, Tamper Box & Button -->
+                    <div class="verify-sidebar">
+                        <form action="/verify-action" method="POST">
+
+                            <!-- Scan Card with Nested QR Code -->
+                            <div class="verify-card scan-card">
+                                <h3 class="scan-title"><span>⛶</span> Scan a Credential</h3>
+                                <p class="scan-desc">Pick a certificate to simulate scanning its QR code.</p>
+
+                                <div class="input-group" style="margin-bottom: 0;">
+                                    <label>Credential</label>
+                                    <select name="certId" id="certSelect" required onchange="revealScanUI()">
+                                        <option value="" disabled <%=!locals.verifiedData ? 'selected' : '' %>>Select a
+                                            certificate...</option>
+                                        <option value="CERT-KQ26MQ" <%=locals.verifiedData &&
+                                            locals.verifiedData.id==='CERT-KQ26MQ' ? 'selected' : '' %>>CERT-KQ26MQ —
+                                            Utkarsh Tripathi</option>
+                                        <option value="CERT-L55EFV" <%=locals.verifiedData &&
+                                            locals.verifiedData.id==='CERT-L55EFV' ? 'selected' : '' %>>CERT-L55EFV —
+                                            Jane Doe</option>
+                                    </select>
+                                </div>
+
+                                <!-- QR Code container -->
+                                <div id="hiddenQR" class="hidden-ui" <%=locals.verifiedData ? 'style="display: block;"'
+                                    : '' %>>
+                                    <div class="mock-qr-code">
+                                        <img id="qrImage"
+                                            src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=<%= locals.verifiedData ? verifiedData.id : 'CERT-KQ26MQ' %>"
+                                            alt="QR Code">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tamper Demo Box -->
+                            <div id="hiddenTamper" class="verify-card tamper-demo-card hidden-ui" <%=locals.verifiedData
+                                ? 'style="display: block;"' : '' %>>
+                                <div class="tamper-header">DEMO · SIMULATE TAMPERING</div>
+                                <p class="tamper-desc">Change the branch to forge the record, then re-scan the
+                                    <strong>same</strong> QR code.</p>
+
+                                <div class="input-group" style="margin-bottom: 0;">
+                                    <label>Branch (issued: <%= locals.verifiedData ? verifiedData.branch
+                                            : 'Chemical Engineering' %>)</label>
+                                    <input type="text" name="tamperBranch" placeholder="Computer Science">
+                                </div>
+                            </div>
+
+                            <!-- Scan & Verify Button -->
+                            <button type="submit" class="btn-verify-submit">⛶ Scan & Verify</button>
+                        </form>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Verification Results -->
+                    <div class="verify-results">
+                        <% if (!locals.verifiedData) { %>
+                            <div class="results-empty-state"></div>
+                            <% } else { %>
+
+                                <div class="verify-success-banner">
+                                    <div class="success-icon-wrapper">
+                                        <svg class="success-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="success-text-content">
+                                        <h4>Verification Successful</h4>
+                                        <p>Data is intact and the institution signature is valid.</p>
+                                    </div>
+                                </div>
+
+                                <div class="verify-data-card">
+                                    <div class="card-top-bar">
+                                        <h4 class="card-title">🎓 Verified Credential</h4>
+                                        <span class="issued-by">🏢 Issued by XYZ University</span>
+                                    </div>
+
+                                    <div class="data-grid">
+                                        <div class="data-item">
+                                            <label>STUDENT NAME</label>
+                                            <div class="val">
+                                                <%= verifiedData.studentName %>
+                                            </div>
+                                        </div>
+                                        <div class="data-item">
+                                            <label>ROLL NUMBER</label>
+                                            <div class="val">
+                                                <%= verifiedData.rollNo %>
+                                            </div>
+                                        </div>
+                                        <div class="data-item">
+                                            <label>CERTIFICATE ID</label>
+                                            <div class="val">
+                                                <%= verifiedData.id %>
+                                            </div>
+                                        </div>
+                                        <div class="data-item">
+                                            <label>DEGREE</label>
+                                            <div class="val">
+                                                <%= verifiedData.degree %>
+                                            </div>
+                                        </div>
+                                        <div class="data-item">
+                                            <label>BRANCH</label>
+                                            <div class="val">
+                                                <%= verifiedData.branch %>
+                                            </div>
+                                        </div>
+                                        <div class="data-item">
+                                            <label>GRADUATION YEAR</label>
+                                            <div class="val">
+                                                <%= verifiedData.gradYear %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="verify-bottom-row">
+
+                                    <!-- SHA-256 Fingerprint -->
+                                    <div class="verify-data-card">
+                                        <h4 class="card-title">🔏 SHA-256 Fingerprint</h4>
+
+                                        <div class="hash-block">
+                                            <label>On record (at issuance)</label>
+                                            <div class="hash-box grey-box">
+                                                <%= verifiedData.originalHash %>
+                                            </div>
+                                        </div>
+
+                                        <div class="hash-block">
+                                            <label>Recomputed (from scan)</label>
+                                            <div class="hash-box green-box">
+                                                <%= verifiedData.recomputedHash %>
+                                            </div>
+                                        </div>
+
+                                        <p class="hash-match-text">Fingerprints match — data is unchanged.</p>
+                                    </div>
+
+                                    <!-- Verification Checks -->
+                                    <div class="verify-data-card">
+                                        <h4 class="card-title">🛡️ Verification Checks</h4>
+                                        <ul class="checks-list">
+                                            <li>
+                                                <div class="check-left">
+                                                    <div class="check-icon-bg">🔄</div>
+                                                    <span>Hash recalculated & matches</span>
+                                                </div>
+                                                <span class="pass">PASS</span>
+                                            </li>
+                                            <li>
+                                                <div class="check-left">
+                                                    <div class="check-icon-bg">🔗</div>
+                                                    <span>Hash-chain link intact</span>
+                                                </div>
+                                                <span class="pass">PASS</span>
+                                            </li>
+                                            <li>
+                                                <div class="check-left">
+                                                    <div class="check-icon-bg">🔑</div>
+                                                    <span>Institution signature valid</span>
+                                                </div>
+                                                <span class="pass">PASS</span>
+                                            </li>
+                                            <li>
+                                                <div class="check-left">
+                                                    <div class="check-icon-bg">⏱️</div>
+                                                    <span>Not in revocation registry</span>
+                                                </div>
+                                                <span class="pass">PASS</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <% } %>
+                    </div>
+                </div>
+        </div>
+
+        <!-- Script to instantly swap QR code on dropdown change -->
+        <script>
+            function revealScanUI() {
+                document.getElementById('hiddenQR').style.display = 'block';
+                document.getElementById('hiddenTamper').style.display = 'block';
+
+                const certId = document.getElementById('certSelect').value;
+                document.getElementById('qrImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + certId;
+            }
+        </script>
+</body>
+
+</html>

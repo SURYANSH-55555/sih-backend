@@ -1,0 +1,66 @@
+<!-- views/partials/sidebar.ejs -->
+<div class="admin-sidebar">
+  <div class="sidebar-header">
+    <div class="brand-title">🛡️ EduVerse</div>
+    <div class="brand-subtitle">Credential Console</div>
+  </div>
+
+  <nav class="sidebar-menu">
+    <!-- Overview -->
+    <a
+      href="/dashboard"
+      class="menu-item <%= activePage === 'overview' ? 'active' : '' %>"
+    >
+      <div class="menu-icon">🎛️</div>
+      <div class="menu-text">
+        <span class="menu-title">Overview</span>
+        <span class="menu-desc">How it works, end to end</span>
+      </div>
+    </a>
+
+    <!-- Issue & Verify -->
+    <a
+      href="/dashboard/issue"
+      class="menu-item <%= activePage === 'issue' ? 'active' : '' %>"
+    >
+      <div class="menu-icon">📄</div>
+      <div class="menu-text">
+        <span class="menu-title">Issue & Verify</span>
+        <span class="menu-desc">Admin credential console</span>
+      </div>
+    </a>
+
+    <!-- Verification Profile -->
+    <a
+      href="/dashboard/verify"
+      class="menu-item <%= activePage === 'verify' ? 'active' : '' %>"
+    >
+      <div class="menu-icon">🔍</div>
+      <div class="menu-text">
+        <span class="menu-title">Verification Profile</span>
+        <span class="menu-desc">The recruiter scan view</span>
+      </div>
+    </a>
+
+    <!-- Revocation Registry -->
+    <a
+      href="/dashboard/revoke"
+      class="menu-item <%= activePage === 'revoke' ? 'active' : '' %>"
+    >
+      <div class="menu-icon">⏱️</div>
+      <div class="menu-text">
+        <span class="menu-title">Revocation Registry</span>
+        <span class="menu-desc">Never delete, always record</span>
+      </div>
+    </a>
+  </nav>
+
+  <!-- NEW: Bottom Info Card -->
+  <div class="sidebar-footer">
+    <div class="footer-title"><span>🔒</span> Credential Service</div>
+    <p class="footer-text">
+      One service, two front doors — the issuance dashboard and the verification
+      portal share the same SHA-256 + signature core.
+    </p>
+  </div>
+</div>

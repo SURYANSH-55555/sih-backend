@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduVerse | Issue & Verify</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="dashboard-body">
+
+    <!-- Inject Sidebar -->
+    <%- include('partials/sidebar') %>
+
+    <!-- The Main Canvas -->
+    <div class="dashboard-content">
+        
+        <!-- Inject Top Navigation -->
+        <%- include('partials/topbar') %>
+
+        <div class="page-header">
+            <h1>Issue & Verify</h1>
+            <p>Generate cryptographically signed credentials for students.</p>
+        </div>
+
+        <!-- 2-COLUMN GRID WRAPPER (This is what keeps them side-by-side) -->
+        <div class="issue-grid">
+            
+            <!-- LEFT COLUMN: Form -->
+            <div class="issue-card form-side">
+                <div class="card-dark-header">
+                    <div class="header-subtitle">ACADEMIC CREDENTIAL SYSTEM</div>
+                    <h2>Issue a Certificate</h2>
+                </div>
+                
+                <div class="card-body">
+                    <form action="/generate-hash" method="POST">
+                        <div class="input-group full-width">
+                            <label>Student Name</label>
+                            <input type="text" name="studentName" placeholder="Utkarsh Tripathi" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Roll Number</label>
+                                <input type="text" name="rollNo" placeholder="125CH0053" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Degree</label>
+                                <select name="degree" required>
+                                    <option value="" disabled>Select Degree...</option>
+                                    <option value="B.E.">B.E.</option>
+                                    <option value="B.Tech" selected>B.Tech</option>
+                                    <option value="B.Tech + M.Tech">B.Tech + M.Tech</option>
+                                    <option value="MBA">MBA</option>
+                                    <option value="M.Tech">M.Tech</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Graduation Year</label>
+                                <input type="number" name="gradYear" placeholder="2029" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Branch</label>
+                                <select name="branch" required>
+                                    <option value="" disabled selected>Select Branch...</option>
+                                    <option value="Biomedical Engineering (B.Tech. - 4yrs)">Biomedical Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Biotechnology (B.Tech. - 4yrs)">Biotechnology (B.Tech. - 4yrs)</option>
+                                    <option value="Civil Engineering (B.Tech. - 4yrs)">Civil Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Chemical Engineering (B.Tech. - 4yrs)">Chemical Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Chemical Engineering (B.Tech. M.Tech Dual Degree - 5yrs)">Chemical Engineering (B.Tech. M.Tech Dual Degree - 5yrs)</option>
+                                    <option value="Ceramic Engineering (B.Tech. - 4yrs)">Ceramic Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Industrial Ceramic (B.Tech. M.Tech Dual Degree - 5yrs)">Industrial Ceramic (B.Tech. M.Tech Dual Degree - 5yrs)</option>
+                                    <option value="Artificial Intelligence (B.Tech. - 4yrs)">Artificial Intelligence (B.Tech. - 4yrs)</option>
+                                    <option value="Computer Science and Engineering (B.Tech. - 4yrs)">Computer Science and Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Chemistry (Integrated M.Sc. - 5yrs)">Chemistry (Integrated M.Sc. - 5yrs)</option>
+                                    <option value="Electronics and Communication Engineering (B.Tech. - 4yrs)">Electronics and Communication Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Electronics and Instrumentation Engineering (B.Tech. - 4yrs)">Electronics and Instrumentation Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Electrical Engineering (B.Tech. - 4yrs)">Electrical Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Food Process Engineering (B.Tech. - 4yrs)">Food Process Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Industrial Design (B.Tech. - 4yrs)">Industrial Design (B.Tech. - 4yrs)</option>
+                                    <option value="Life Science (Integrated M.Sc. - 5yrs)">Life Science (Integrated M.Sc. - 5yrs)</option>
+                                    <option value="Mathematics and Computing (B.Tech. - 4yrs)">Mathematics and Computing (B.Tech. - 4yrs)</option>
+                                    <option value="Mathematics (Integrated M.Sc. - 5yrs)">Mathematics (Integrated M.Sc. - 5yrs)</option>
+                                    <option value="Mechanical Engineering (B.Tech. - 4yrs)">Mechanical Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Metallurgical and Materials Engineering (B.Tech. - 4yrs)">Metallurgical and Materials Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Metallurgical and Materials Engineering (B.Tech. M.Tech Dual Degree - 5yrs)">Metallurgical and Materials Engineering (B.Tech. M.Tech Dual Degree - 5yrs)</option>
+                                    <option value="Mining Engineering (B.Tech. - 4yrs)">Mining Engineering (B.Tech. - 4yrs)</option>
+                                    <option value="Mining Engineering (B.Tech. M.Tech Dual Degree - 5yrs)">Mining Engineering (B.Tech. M.Tech Dual Degree - 5yrs)</option>
+                                    <option value="Architecture (B.Arch. - 5yrs)">Architecture (B.Arch. - 5yrs)</option>
+                                    <option value="Engineering Physics (B.Tech. - 4yrs)">Engineering Physics (B.Tech. - 4yrs)</option>
+                                    <option value="Physics (Integrated M.Sc. - 5yrs)">Physics (Integrated M.Sc. - 5yrs)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- ONE Single Submit Button -->
+                        <button type="submit" class="btn-issue-submit">Issue Certificate</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Generated Credential Display -->
+            <div class="issue-card result-side">
+                <h3 class="result-title">Generated Credential</h3>
+                <p class="result-desc">Every issued record is hashed with SHA-256 and signed with the institution's private key.</p>
+                
+                <% if (!locals.credentialData) { %>
+                    <!-- EMPTY STATE -->
+                    <div class="empty-state-box">
+                        <div class="qr-icon">🔲</div>
+                        <p>Fill in the form and issue a certificate to generate its hash, signature, and QR code.</p>
+                    </div>
+                <% } else { %>
+                    <!-- SUCCESS STATE -->
+                    <div class="success-state-box">
+                        <div class="success-badge">✅ Credential Secured</div>
+                        
+                        <div class="data-row"><strong>Name:</strong> <%= credentialData.studentName %></div>
+                        <div class="data-row"><strong>Cert ID:</strong> <%= credentialData.id %></div>
+                        
+                        <div class="hash-display">
+                            <div class="hash-label">SHA-256 Fingerprint:</div>
+                            <div class="hash-string"><%= credentialData.hash %></div>
+                        </div>
+
+                        <div class="qr-display">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=<%= credentialData.hash %>" alt="QR Code">
+                            <p style="font-size: 0.8rem; color: #64748b; margin-top: 10px;">Scan to Verify</p>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+        </div> <!-- Closes the issue-grid 2-column wrapper -->
+    </div> <!-- Closes dashboard-content -->
+
+</body>
+</html>
