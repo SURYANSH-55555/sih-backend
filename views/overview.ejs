@@ -1,194 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EduVerse | Overview</title>
-    <link rel="stylesheet" href="/style.css" />
-  </head>
-  <body class="dashboard-body">
-    <!-- Inject the Sidebar -->
-    <%- include('partials/sidebar') %>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduVerse | Overview</title>
+  
+  <!-- Links to your specific Overview CSS file -->
+  <link rel="stylesheet" href="/css/pages/overview.css">
+</head>
+<body>
 
-    <!-- The Main Canvas -->
-    <div class="dashboard-content">
-      <!-- Inject the Top Navigation -->
-      <%- include('partials/topbar') %>
-
-      <!-- Page Header -->
-      <div class="page-header">
-        <h1>Overview</h1>
-        <p>How the tamper-evident credential system works, end to end.</p>
+  <!-- Top Dark Navigation Bar -->
+  <header>
+    <div class="brand-section">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
       </div>
-
-      <!-- 1. Dark Hero Card -->
-      <div class="hero-card">
-        <div class="hero-subtitle">Self-Verifying Digital Certificates</div>
-        <h2 class="hero-title">
-          Issue once. Verify anywhere.<br />Trust no middleman.
-        </h2>
-        <p class="hero-desc">
-          Every certificate carries its own proof of authenticity — a
-          cryptographic fingerprint and a digital signature that anyone can
-          check instantly, without a phone call to the registrar.
-        </p>
-
-        <!-- Stats Grid inside the Hero Card -->
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div class="stat-number">2</div>
-            <div class="stat-label">Credentials issued</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-number">2</div>
-            <div class="stat-label">Active</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-number">0</div>
-            <div class="stat-label">Revoked</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-number">SHA-256</div>
-            <div class="stat-label">Fingerprint</div>
-          </div>
-        </div>
+      <div class="brand-text">
+        <h2>EduVerse</h2>
+        <span>Credential Console</span>
       </div>
+    </div>
 
-      <!-- 2. Process Flow UI -->
-      <div class="workflow-section">
-        <!-- Issuance (Light Card) -->
-        <div class="workflow-card light-card">
-          <div class="workflow-label">ISSUANCE</div>
-          <div class="workflow-steps">
-            <div class="step">
-              <div class="icon-circle dark-icon">🏢</div>
-              <p>Institution enters<br />data</p>
-              <div class="step-arrow">&rarr;</div>
-            </div>
-            <div class="step">
-              <div class="icon-circle dark-icon">🔐</div>
-              <p>SHA-256 hash<br />generated</p>
-              <div class="step-arrow">&rarr;</div>
-            </div>
-            <div class="step">
-              <div class="icon-circle dark-icon">✍️</div>
-              <p>Private key signs<br />record</p>
-              <div class="step-arrow">&rarr;</div>
-            </div>
-            <div class="step">
-              <div class="icon-circle dark-icon">🔳</div>
-              <p>QR code created</p>
-              <div class="step-arrow">&rarr;</div>
-            </div>
-            <div class="step">
-              <div class="icon-circle dark-icon">🎓</div>
-              <p>Student receives<br />credential</p>
-            </div>
-          </div>
+    <!-- Corrected Top Navigation Links -->
+    <ul class="nav-links">
+      <li>
+        <a href="/dashboard" class="active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Overview
+        </a>
+      </li>
+      <li>
+        <a href="/dashboard/issue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Issue & Verify
+        </a>
+      </li>
+      <li>
+        <a href="/dashboard/verify">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          Verification Profile
+        </a>
+      </li>
+      <li>
+        <a href="/dashboard/revoke">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Revocation Registry
+        </a>
+      </li>
+    </ul>
+
+    <div class="header-right">
+      <button class="btn-logout">Logout</button>
+    </div>
+  </header>
+
+  <!-- Centered Content Canvas -->
+  <main class="dashboard-content">
+    
+    <div class="page-header">
+      <h1>Overview</h1>
+      <p>How the tamper-proof credential system works, end to end.</p>
+    </div>
+
+    <!-- 1. Dark Hero Card -->
+    <div class="hero-card">
+      <div class="hero-subtitle">Self-Verifying Digital Certificates</div>
+      <h2 class="hero-title">
+        Issue once. Verify anywhere.<br />Trust no middleman.
+      </h2>
+      <p class="hero-desc">
+        Every certificate carries its own proof of authenticity — a cryptographic fingerprint and a digital signature that anyone can check instantly, without a phone call to the registrar.
+      </p>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-number">2</div>
+          <div class="stat-label">Credentials issued</div>
         </div>
-
-        <!-- Verification (Dark Card) -->
-        <div class="workflow-card dark-card">
-          <div class="workflow-label">VERIFICATION</div>
-          <div class="workflow-steps">
-            <div class="step">
-              <div class="icon-circle light-icon">📱</div>
-              <p>Recruiter scans QR</p>
-              <div class="step-arrow">&rarr;</div>
-            </div>
-            <div class="step">
-              <div class="icon-circle light-icon">🗄️</div>
-              <p>Record retrieved</p>
-              <div class="step-arrow">&rarr;</div>
-            </div>
-            <div class="step">
-              <div class="icon-circle light-icon">🔄</div>
-              <p>Hash recalculated</p>
-              <div class="step-arrow">&rarr;</div>
-            </div>
-            <div class="step">
-              <div class="icon-circle light-icon">🔑</div>
-              <p>Signature checked</p>
-              <div class="step-arrow">&rarr;</div>
-            </div>
-            <div class="step">
-              <div class="icon-circle light-icon">✅</div>
-              <p>Result displayed</p>
-            </div>
-          </div>
+        <div class="stat-box">
+          <div class="stat-number">2</div>
+          <div class="stat-label">Active</div>
         </div>
-      </div>
-
-      <!-- 3. Status Definition Cards -->
-      <div class="status-cards-grid">
-        <div class="status-card">
-          <div class="status-header">
-            <div class="status-icon verified-icon">✓</div>
-            <h4 class="verified-text">Verified</h4>
-          </div>
-          <p>
-            Certificate is authentic. Data is unchanged and the institution
-            signature is valid.
-          </p>
+        <div class="stat-box">
+          <div class="stat-number">0</div>
+          <div class="stat-label">Revoked</div>
         </div>
-
-        <div class="status-card">
-          <div class="status-header">
-            <div class="status-icon tampered-icon">✕</div>
-            <h4 class="tampered-text">Tamper Detected</h4>
-          </div>
-          <p>
-            Certificate data has been modified since issuance — the recomputed
-            hash no longer matches.
-          </p>
-        </div>
-
-        <div class="status-card">
-          <div class="status-header">
-            <div class="status-icon revoked-icon">!</div>
-            <h4 class="revoked-text">Revoked</h4>
-          </div>
-          <p>
-            Certificate was genuinely issued, but has since been revoked by the
-            institution.
-          </p>
-        </div>
-      </div>
-
-      <!-- 4. Tamper Evidence Demo -->
-      <div class="tamper-card">
-        <div class="workflow-label">TAMPER EVIDENCE</div>
-        <h3 class="tamper-title">The hash: a digital fingerprint</h3>
-        <p class="tamper-desc">
-          A SHA-256 hash is a fixed-length code calculated from the certificate
-          data. Change even one character and the hash changes completely —
-          instantly revealing tampering.
-        </p>
-
-        <div class="hash-demo">
-          <!-- Row 1 (Valid) -->
-          <div class="hash-row">
-            <div class="data-box">Branch: Chemical Engineering</div>
-            <div class="hash-badge">SHA-256</div>
-            <div class="arrow-right">&rarr;</div>
-            <div class="result-box hash-match">Hash = A91F8C7E3D2B...</div>
-          </div>
-
-          <!-- Row 2 (Tampered) -->
-          <div class="hash-row">
-            <div class="data-box">Branch: Computer Science (edited)</div>
-            <div class="hash-badge">SHA-256</div>
-            <div class="arrow-right">&rarr;</div>
-            <div class="result-box hash-mismatch">Hash = 91BC28A0F41C...</div>
-          </div>
-        </div>
-
-        <div class="tamper-alert">
-          Completely different hashes &rarr; the system instantly knows the data
-          no longer matches what was originally issued.
+        <div class="stat-box">
+          <div class="stat-number">SHA-256</div>
+          <div class="stat-label">Fingerprint</div>
         </div>
       </div>
     </div>
-    <!-- Safely closes the dashboard-content -->
-  </body>
+
+    <!-- 2. Process Flow UI (Light Issuance Card) -->
+    <div class="card">
+      <div class="workflow-label">ISSUANCE</div>
+      <div class="workflow-steps">
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle dark-icon">🏢</div>
+            <p>Institution enters<br />data</p>
+          </div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle dark-icon">🔐</div>
+            <p>SHA-256 hash<br />generated</p>
+          </div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle dark-icon">✍️</div>
+            <p>Private key signs<br />record</p>
+          </div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle dark-icon">🔳</div>
+            <p>QR code<br />created</p>
+          </div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle dark-icon">🎓</div>
+            <p>Student receives<br />credential</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2b. Process Flow UI (Dark Verification Flow) -->
+    <div class="card dark-workflow-card">
+      <div class="workflow-label">VERIFICATION</div>
+      <div class="workflow-steps">
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle">📱</div>
+            <p>Recruiter scans QR</p>
+          </div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle">🗄️</div>
+            <p>Record retrieved</p>
+          </div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle">🔄</div>
+            <p>Hash recalculated</p>
+          </div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle">🔑</div>
+            <p>Signature checked</p>
+          </div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="step">
+          <div class="step-content">
+            <div class="icon-circle">✅</div>
+            <p>Result displayed</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Status Definition Cards Grid -->
+    <div class="status-cards-grid">
+      <div class="status-card">
+        <div class="status-header">
+          <div class="status-icon verified-icon">✓</div>
+          <h4 class="verified-text">Verified</h4>
+        </div>
+        <p>Certificate is authentic. Data is unchanged and the institution signature is valid.</p>
+      </div>
+
+      <div class="status-card">
+        <div class="status-header">
+          <div class="status-icon tampered-icon">✕</div>
+          <h4 class="tampered-text">Tamper Detected</h4>
+        </div>
+        <p>Certificate data has been modified since issuance — the recomputed hash no longer matches.</p>
+      </div>
+
+      <div class="status-card">
+        <div class="status-header">
+          <div class="status-icon revoked-icon">!</div>
+          <h4 class="revoked-text">Revoked</h4>
+        </div>
+        <p>Certificate was genuinely issued, but has since been revoked by the institution.</p>
+      </div>
+    </div>
+
+    <!-- 4. Tamper Evidence Card -->
+    <div class="card">
+      <div class="workflow-label">TAMPER EVIDENCE</div>
+      <h3 class="tamper-title">The hash: a digital fingerprint</h3>
+      <p class="tamper-desc">
+        A SHA-256 hash is a fixed-length code calculated from the certificate data. Change even one character and the hash changes completely — instantly revealing tampering.
+      </p>
+
+      <div class="hash-demo">
+        <div class="hash-row">
+          <div class="data-box">Branch: Chemical Engineering</div>
+          <div class="hash-badge">SHA-256</div>
+          <div class="arrow-right">&rarr;</div>
+          <div class="result-box hash-match">Hash = A91F8C7E3D2B...</div>
+        </div>
+
+        <div class="hash-row">
+          <div class="data-box">Branch: Computer Science (edited)</div>
+          <div class="hash-badge">SHA-256</div>
+          <div class="arrow-right">&rarr;</div>
+          <div class="result-box hash-mismatch">Hash = 91BC28A0F41C...</div>
+        </div>
+      </div>
+
+      <div class="tamper-alert">
+        Completely different hashes &rarr; the system instantly knows the data no longer matches what was originally issued.
+      </div>
+    </div>
+
+  </main>
+
+</body>
 </html>

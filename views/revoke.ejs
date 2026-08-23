@@ -1,115 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduVerse | Revocation Registry</title>
-    <link rel="stylesheet" href="/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduVerse | Revocation Registry</title>
+  
+  <!-- Links to your specific Revoke CSS file -->
+  <link rel="stylesheet" href="/css/pages/revoke.css">
 </head>
-<body class="dashboard-body">
+<body>
 
-    <%- include('partials/sidebar') %>
+  <!-- Top Dark Navigation Bar -->
+  <header>
+    <div class="brand-section">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h2>EduVerse</h2>
+        <span>Credential Console</span>
+      </div>
+    </div>
 
-    <div class="dashboard-content">
-        <%- include('partials/topbar') %>
+    <!-- Corrected Top Navigation Links -->
+    <ul class="nav-links">
+      <li>
+        <a href="/dashboard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Overview
+        </a>
+      </li>
+      <li>
+        <a href="/dashboard/issue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Issue & Verify
+        </a>
+      </li>
+      <li>
+        <a href="/dashboard/verify">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          Verification Profile
+        </a>
+      </li>
+      <li>
+        <a href="/dashboard/revoke" class="active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Revocation Registry
+        </a>
+      </li>
+    </ul>
 
-        <div class="page-header">
-            <h1>Revocation Registry</h1>
-            <p>Append-only revocation records for issued credentials.</p>
+    <div class="header-right">
+      <button class="btn-logout">Logout</button>
+    </div>
+  </header>
+
+  <!-- Centered Content Canvas -->
+  <main class="dashboard-content">
+    
+    <div class="page-header">
+      <h1>Revocation Registry</h1>
+      <p>Append-only revocation records for issued credentials.</p>
+    </div>
+
+    <!-- 2-Column Top Section -->
+    <div class="revoke-grid">
+      
+      <!-- LEFT: Revoke Form Card -->
+      <div class="card">
+        <h2 class="card-title">Revoke a Credential</h2>
+        <p class="card-desc">We never delete history — revoking appends a record and flips the status. The original stays visible for audit.</p>
+        
+        <form action="/revoke-action" method="POST">
+          <div class="input-group">
+            <label>Certificate</label>
+            <select name="certId" required>
+              <option value="" disabled selected>Select an active certificate...</option>
+              <option value="CERT-KQ26MQ">CERT-KQ26MQ — Rahul Kumar</option>
+              <option value="CERT-L55EFV">CERT-L55EFV — Jane Doe</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Reason</label>
+            <select name="reason" required>
+              <option value="" disabled selected>Select revocation reason...</option>
+              <option value="Academic misconduct discovered">Academic misconduct discovered</option>
+              <option value="Administrative Discrepancy">Administrative Discrepancy</option>
+              <option value="Duplicate Issuance">Duplicate Issuance</option>
+              <option value="Student Requested Invalidation">Student Requested Invalidation</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-revoke-submit">
+            <span>⏱️</span> Revoke Certificate
+          </button>
+        </form>
+      </div>
+
+      <!-- RIGHT: "Why this matters" Info Card -->
+      <div class="card revoke-info-card">
+        <div class="info-box-top">
+          <div class="warning-icon-bg">⚠️</div>
+          <div>
+            <div class="info-tag">VERIFICATION PORTAL NOW SHOWS</div>
+            <h3>Certificate Revoked</h3>
+          </div>
         </div>
 
-        <!-- 2-Column Top Section -->
-        <div class="revoke-grid">
-            
-            <!-- LEFT: Revoke Form Card -->
-            <div class="revoke-card">
-                <div class="revoke-card-title">Revoke a Credential</div>
-                <p class="revoke-card-desc">We never delete history — revoking appends a record and flips the status. The original stays visible for audit.</p>
-                
-                <form action="/revoke-action" method="POST">
-                    <div class="input-group">
-                        <label>Certificate</label>
-                        <select name="certId" required>
-                            <option value="" disabled selected>Select an active certificate...</option>
-                            <option value="CERT-KQ26MQ">CERT-KQ26MQ — Rahul Kumar</option>
-                            <option value="CERT-L55EFV">CERT-L55EFV — Jane Doe</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Reason</label>
-                        <select name="reason" required>
-                            <option value="" disabled selected>Select revocation reason...</option>
-                            <option value="Academic misconduct discovered">Academic misconduct discovered</option>
-                            <option value="Administrative Discrepancy">Administrative Discrepancy</option>
-                            <option value="Duplicate Issuance">Duplicate Issuance</option>
-                            <option value="Student Requested Invalidation">Student Requested Invalidation</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn-revoke-submit">
-                        <span>⏱️</span> Revoke Certificate
-                    </button>
-                </form>
-            </div>
-
-            <!-- RIGHT: "Why this matters" Info Card -->
-            <div class="revoke-info-box">
-                <div class="info-box-top">
-                    <div class="warning-icon-bg">⚠️</div>
-                    <div>
-                        <div class="info-tag">VERIFICATION PORTAL NOW SHOWS</div>
-                        <h3>Certificate Revoked</h3>
-                    </div>
-                </div>
-
-                <div class="why-matters-title">Why this matters</div>
-                <ul class="why-matters-list">
-                    <li><span>✓</span> Preserves a complete, auditable history.</li>
-                    <li><span>✓</span> Distinguishes REVOKED from TAMPERED.</li>
-                    <li><span>✓</span> Matches how real institutions correct errors.</li>
-                </ul>
-            </div>
-
-        </div>
-
-        <!-- BOTTOM: Revocation Records Section -->
-        <div class="revocation-records-wrapper">
-            <div class="records-header-bar">
-                <div class="records-title"><span>⏱️</span> Revocation Records</div>
-                <div class="revoked-count-badge"><%= revokedList.length %> revoked</div>
-            </div>
-
-            <div class="records-body">
-                <% if (!locals.revokedList || revokedList.length === 0) { %>
-                    <div class="empty-records">No revoked credentials recorded.</div>
-                <% } else { %>
-                    <% revokedList.forEach(item => { %>
-                        <div class="record-row-card">
-                            <div class="record-col">
-                                <label>CERTIFICATE ID</label>
-                                <div class="val font-mono"><%= item.id %></div>
-                                <div class="sub-name"><%= item.studentName %></div>
-                            </div>
-                            <div class="record-col">
-                                <label>STATUS</label>
-                                <div class="val"><span class="badge-revoked">● REVOKED</span></div>
-                            </div>
-                            <div class="record-col reason-col">
-                                <label>REASON</label>
-                                <div class="val"><%= item.reason %></div>
-                            </div>
-                            <div class="record-col">
-                                <label>REVOKED ON</label>
-                                <div class="val"><%= item.revokedDate %></div>
-                            </div>
-                        </div>
-                    <% }) %>
-                <% } %>
-            </div>
-        </div>
+        <div class="why-matters-title">Why this matters</div>
+        <ul class="why-matters-list">
+          <li><span>✓</span> Preserves a complete, auditable history.</li>
+          <li><span>✓</span> Distinguishes REVOKED from TAMPERED.</li>
+          <li><span>✓</span> Matches how real institutions correct errors.</li>
+        </ul>
+      </div>
 
     </div>
+
+    <!-- BOTTOM: Revocation Records Section -->
+    <div class="card">
+      <div class="records-header-bar">
+        <div class="records-title"><span>⏱️</span> Revocation Records</div>
+        <div class="revoked-count-badge"><%= locals.revokedList ? revokedList.length : 0 %> revoked</div>
+      </div>
+
+      <div class="records-body">
+        <% if (!locals.revokedList || revokedList.length === 0) { %>
+          <div class="empty-records">No revoked credentials recorded.</div>
+        <% } else { %>
+          <% revokedList.forEach(item => { %>
+            <div class="record-row-card">
+              <div class="record-col">
+                <label>CERTIFICATE ID</label>
+                <div class="val font-mono"><%= item.id %></div>
+                <div class="sub-name"><%= item.studentName %></div>
+              </div>
+              <div class="record-col">
+                <label>STATUS</label>
+                <div class="val"><span class="badge-revoked">● REVOKED</span></div>
+              </div>
+              <div class="record-col">
+                <label>REASON</label>
+                <div class="val"><%= item.reason %></div>
+              </div>
+              <div class="record-col">
+                <label>REVOKED ON</label>
+                <div class="val"><%= item.revokedDate %></div>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+  </main>
 
 </body>
 </html>

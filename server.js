@@ -73,8 +73,8 @@ app.get("/dashboard/issue", (req, res) => {
   });
 });
 
-// Issue Page Form Submission (POST)
-app.post("/generate-hash", (req, res) => {
+// Issue Page Form Submission (POST) - Updated to handle both /generate-hash and /dashboard/issue
+app.post(["/generate-hash", "/dashboard/issue"], (req, res) => {
   const { studentName, rollNo, gradYear, degree, branch } = req.body;
 
   const rawData = `${studentName}|${rollNo}|${degree}|${branch}|${gradYear}`;
@@ -187,7 +187,6 @@ app.post("/login", (req, res) => {
     return res.redirect("/login");
   }
 
-  // Personalize data based on login input
   let studentData = {
     name: loginId,
     rollNo: "125CH0053",
@@ -219,7 +218,7 @@ app.get("/student-portal", (req, res) => {
   res.render("student-portal", { student: studentData });
 });
 
-// 6. Start the Server (Must be at the very bottom)
+// 6. Start the Server
 app.listen(port, () => {
   console.log(`Server is awake and listening on port ${port}`);
 });
