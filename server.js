@@ -60,7 +60,7 @@ app.get("/test-hash", function (req, res) {
   });
 });
 
-// 4. Dashboard Routes
+// 4. Dashboard & Admin Routes
 app.get("/dashboard", (req, res) => {
   res.render("overview", { activePage: "overview" });
 });
@@ -172,7 +172,54 @@ app.post("/revoke-action", (req, res) => {
   res.redirect("/dashboard/revoke");
 });
 
-// 5. Start the Server (Must be at the very bottom)
+// 5. Student Portal & Login Routes
+
+// Render the Student Login Page (GET)
+app.get("/login", (req, res) => {
+  res.render("login", { activePage: "login" });
+});
+
+// Handle Student Login Submission (POST)
+app.post("/login", (req, res) => {
+  const { loginId, password } = req.body;
+
+  if (!loginId || !password) {
+    return res.redirect("/login");
+  }
+
+  // Personalize data based on login input
+  let studentData = {
+    name: loginId,
+    rollNo: "125CH0053",
+    branch: "Chemical Engineering",
+    gradYear: "2029",
+  };
+
+  if (loginId.toLowerCase().includes("rahul")) {
+    studentData = {
+      name: "Rahul Kumar",
+      rollNo: "2021CS0456",
+      branch: "Chemical Engineering",
+      gradYear: "2027",
+    };
+  }
+
+  res.render("student-portal", { student: studentData });
+});
+
+// Fallback direct route for student portal
+app.get("/student-portal", (req, res) => {
+  const studentData = {
+    name: "Utkarsh Tripathi",
+    rollNo: "125CH0053",
+    branch: "Chemical Engineering",
+    gradYear: "2029",
+  };
+
+  res.render("student-portal", { student: studentData });
+});
+
+// 6. Start the Server (Must be at the very bottom)
 app.listen(port, () => {
   console.log(`Server is awake and listening on port ${port}`);
 });

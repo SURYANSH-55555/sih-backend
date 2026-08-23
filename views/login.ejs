@@ -14,7 +14,7 @@
       }
 
       body {
-        background-color: #FFFFFF(0, 0%, 100%);
+        background-color: #f8fafc;
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -70,13 +70,6 @@
       .header-text p {
         color: #94a3b8;
         font-size: 0.9rem;
-      }
-
-      
-
-      .tab-btn.active {
-        background-color: #223249;
-        color: #ffffff;
       }
 
       .input-group {
@@ -200,12 +193,14 @@
         <p>Enter your credentials to access your dashboard</p>
       </div>
 
-      <form onsubmit="event.preventDefault()">
+      <!-- Configured to submit via POST to /login route -->
+      <form action="/login" method="POST">
         <div class="input-group">
           <label for="login-id">Login ID</label>
           <input
             type="text"
             id="login-id"
+            name="loginId"
             placeholder="Enter your student ID"
             required
           />
@@ -217,6 +212,7 @@
             <input
               type="password"
               id="password"
+              name="password"
               placeholder="••••••••••••"
               required
             />
@@ -247,20 +243,11 @@
       </form>
 
       <div class="footer">
-        New to EduVerse? <a href="#create">Create an Account</a>
+        New to EduVerse? <a href="#">Create an Account</a>
       </div>
     </div>
 
     <script>
-      function setRole(role) {
-        document
-          .getElementById("btn-student")
-          .classList.toggle("active", role === "student");
-        document
-          .getElementById("btn-educator")
-          .classList.toggle("active", role === "educator");
-      }
-
       function togglePasswordVisibility() {
         const pwd = document.getElementById("password");
         pwd.type = pwd.type === "password" ? "text" : "password";
