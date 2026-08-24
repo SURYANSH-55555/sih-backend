@@ -60,6 +60,27 @@ app.get("/test-hash", function (req, res) {
   });
 });
 
+// Show the Administration Login Page
+app.get("/administration_login", (req, res) => {
+  // We check if the URL has ?error=true so we can show a wrong password warning
+  const showError = req.query.error === "true";
+  res.render("administration_login", { error: showError });
+});
+
+// Process the Login Attempt
+app.post("/administration_login", (req, res) => {
+  const enteredPassword = req.body.password;
+
+  // Check if the password matches exactly
+  if (enteredPassword === "nitr769008") {
+    // Success! Send them to the dashboard
+    res.redirect("/dashboard");
+  } else {
+    // Failed! Send them back to the login page with an error flag
+    res.redirect("/administration_login?error=true");
+  }
+});
+
 // 4. Dashboard & Admin Routes
 app.get("/dashboard", (req, res) => {
   res.render("overview", { activePage: "overview" });

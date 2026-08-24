@@ -120,6 +120,7 @@
         .top-grid {
           grid-template-columns: 1fr;
         }
+
         .header-title {
           display: none;
         }
@@ -170,11 +171,12 @@
         font-weight: 700;
       }
 
-      /* Date & Time Card */
+      /* Date & Time Card (FIXED LAYOUT) */
       .datetime-card {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: flex-start; /* Keeps items grouped at the top */
+        gap: 16px; /* Tight gap between header and date */
       }
 
       .dt-header {
@@ -187,7 +189,7 @@
       }
 
       .dt-body {
-        margin-top: 1rem;
+        margin-top: 0; /* Removed the massive top margin */
       }
 
       .dt-date {
@@ -204,7 +206,11 @@
         font-weight: 500;
       }
 
-      /* Certificates Section */
+      /* Certificates Section (FIXED WIDTH) */
+      .certs-card {
+        grid-column: 1 / -1; /* This forces the certificates to span the entire screen width */
+      }
+
       .certs-card h2 {
         font-size: 1.3rem;
         font-weight: 800;
@@ -356,6 +362,7 @@
       }
     </style>
   </head>
+
   <body>
     <!-- Top Dark Header -->
     <header>
@@ -380,7 +387,7 @@
       <div class="header-title">Dashboard</div>
 
       <div class="header-actions">
-        <!-- Replace the button in views/student-portal.ejs -->
+        <!-- Logout Button -->
         <a
           href="/"
           class="btn-logout"
@@ -426,12 +433,23 @@
               <circle cx="12" cy="7" r="4" />
             </svg>
           </div>
-          <!-- Update the profile-info section inside views/student-portal.ejs -->
           <div class="profile-info">
-            <div><span>NAME :</span> <%= student.name %></div>
-            <div><span>ROLL NO. :</span> <%= student.rollNo %></div>
-            <div><span>BRANCH :</span> <%= student.branch %></div>
-            <div><span>YEAR OF GRADUATION :</span> <%= student.gradYear %></div>
+            <div>
+              <span>NAME :</span>
+              <%= student.name %>
+            </div>
+            <div>
+              <span>ROLL NO. :</span>
+              <%= student.rollNo %>
+            </div>
+            <div>
+              <span>BRANCH :</span>
+              <%= student.branch %>
+            </div>
+            <div>
+              <span>YEAR OF GRADUATION :</span>
+              <%= student.gradYear %>
+            </div>
           </div>
         </div>
 
@@ -455,102 +473,138 @@
             Date and Time:
           </div>
           <div class="dt-body">
-            <div class="dt-date">Monday, June 16, 2025</div>
-            <div class="dt-sync">Last Sync: 10:42 AM IST (1 minute ago)</div>
+            <div class="dt-date" id="live-date">Loading...</div>
+            <div class="dt-sync" id="live-time">Current Time: Loading...</div>
           </div>
         </div>
-      </div>
 
-      <!-- Certificates Container -->
-      <div class="card certs-card">
-        <h2>Certificates:</h2>
+        <!-- Certificates Container -->
+        <div class="card certs-card">
+          <h2>Certificates:</h2>
 
-        <!-- Cert 1 -->
-        <div class="cert-item">
-          <div class="accent-bar"></div>
-          <div class="cert-header">
-            <span class="cert-badge">DEGREE CERTIFICATE</span>
-            <span class="status-badge">
-              <span class="status-dot"></span>
-              Active / Valid
-            </span>
-          </div>
-          <div class="cert-title">Bachelor of Technology in</div>
-          <div class="cert-meta">
-            Issuing Body: <strong>National Institute of Technology</strong> |
-            Issued: <strong>June 10, 2025</strong><br />
-            Batch: 2021-2025
-          </div>
-          <div class="cert-footer">
-            <div class="hash-box">Block Hash:</div>
-            <div class="actions-group">
-              <button class="btn-download">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                Download PDF
-              </button>
-              <button class="btn-secondary">View QR</button>
-              <button class="btn-secondary">Verify</button>
+          <!-- Cert 1 -->
+          <div class="cert-item">
+            <div class="accent-bar"></div>
+            <div class="cert-header">
+              <span class="cert-badge">DEGREE CERTIFICATE</span>
+              <span class="status-badge">
+                <span class="status-dot"></span>
+                Active / Valid
+              </span>
+            </div>
+            <div class="cert-title">Bachelor of Technology in</div>
+            <div class="cert-meta">
+              Issuing Body: <strong>National Institute of Technology</strong> |
+              Issued: <strong>June 10, 2025</strong><br />
+              Batch: 2021-2025
+            </div>
+            <div class="cert-footer">
+              <div class="hash-box">Block Hash:</div>
+              <div class="actions-group">
+                <button class="btn-download">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Download PDF
+                </button>
+                <button class="btn-secondary">View QR</button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Cert 2 -->
-        <div class="cert-item">
-          <div class="accent-bar"></div>
-          <div class="cert-header">
-            <span class="cert-badge">OFFICIAL TRANSCRIPT</span>
-            <span class="status-badge">
-              <span class="status-dot"></span>
-              Active / Valid
-            </span>
-          </div>
-          <div class="cert-title">
-            8th Semester Consolidated Academic Grade Card
-          </div>
-          <div class="cert-meta">
-            Issuing Body: <strong>Office of the Dean (Academics)</strong> |
-            Issued: <strong>June 10, 2025</strong><br />
-            Batch: 2021-2025
-          </div>
-          <div class="cert-footer">
-            <div class="hash-box">Block Hash:</div>
-            <div class="actions-group">
-              <button class="btn-download">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                Download PDF
-              </button>
-              <button class="btn-secondary">View QR</button>
-              <button class="btn-secondary">Verify</button>
+          <!-- Cert 2 -->
+          <div class="cert-item">
+            <div class="accent-bar"></div>
+            <div class="cert-header">
+              <span class="cert-badge">OFFICIAL TRANSCRIPT</span>
+              <span class="status-badge">
+                <span class="status-dot"></span>
+                Active / Valid
+              </span>
+            </div>
+            <div class="cert-title">
+              8th Semester Consolidated Academic Grade Card
+            </div>
+            <div class="cert-meta">
+              Issuing Body: <strong>Office of the Dean (Academics)</strong> |
+              Issued: <strong>June 10, 2025</strong><br />
+              Batch: 2021-2025
+            </div>
+            <div class="cert-footer">
+              <div class="hash-box">Block Hash:</div>
+              <div class="actions-group">
+                <button class="btn-download">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Download PDF
+                </button>
+                <button class="btn-secondary">View QR</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <script>
+      function updateLiveClock() {
+        const now = new Date();
+
+        // 1. Format the Date
+        const dateOptions = {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        };
+        const formattedDate = now.toLocaleDateString("en-US", dateOptions);
+
+        // 2. Format the Time with seconds
+        const timeOptions = {
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZoneName: "short",
+        };
+        const formattedTime = now.toLocaleTimeString("en-US", timeOptions);
+
+        // 3. Inject them into your specific divs
+        const dateElement = document.getElementById("live-date");
+        const timeElement = document.getElementById("live-time");
+
+        if (dateElement) dateElement.innerText = formattedDate;
+        if (timeElement)
+          timeElement.innerText = "Current Time: " + formattedTime;
+      }
+
+      // Run it once immediately so there is no lag on page load
+      updateLiveClock();
+
+      // Keep it ticking every 1000 milliseconds (1 second)
+      setInterval(updateLiveClock, 1000);
+    </script>
   </body>
 </html>

@@ -165,8 +165,26 @@
         text-decoration: underline;
         font-weight: 600;
       }
+
+      /* Full Screen Transition Overlay */
+      #transition-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(17, 24, 39, 0.85);
+        backdrop-filter: blur(10px);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
     </style>
   </head>
+
   <body>
     <div class="card">
       <div class="logo-container">
@@ -247,11 +265,47 @@
       </div>
     </div>
 
+    <!-- Lottie Player Script -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <!-- Full Screen Transition Overlay with Lottie Animation -->
+    <div id="transition-overlay">
+      <lottie-player
+        src="https://lottie.host/28cc0d91-b674-43a9-ad22-230fa6d57093/fXDg9P20Li.json"
+        background="transparent"
+        speed="1"
+        style="width: 250px; height: 250px"
+        loop
+        autoplay
+      >
+      </lottie-player>
+    </div>
+
     <script>
       function togglePasswordVisibility() {
         const pwd = document.getElementById("password");
         pwd.type = pwd.type === "password" ? "text" : "password";
       }
+
+      const loginForm = document.querySelector("form");
+      const overlay = document.getElementById("transition-overlay");
+
+      loginForm.addEventListener("submit", function (e) {
+        e.preventDefault(); // Stop instant form submission
+
+        // 1. Show the overlay flex container
+        overlay.style.display = "flex";
+
+        // 2. Fade in smoothly
+        setTimeout(() => {
+          overlay.style.opacity = "1";
+        }, 10);
+
+        // 3. Play animation for 2.5 seconds, then submit the form to the backend
+        setTimeout(() => {
+          loginForm.submit();
+        }, 3000);
+      });
     </script>
   </body>
 </html>

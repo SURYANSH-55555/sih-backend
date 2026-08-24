@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduVerse | Administration Login</title>
+  
+  <!-- Updated link to your newly named CSS file -->
+  <link rel="stylesheet" href="/css/pages/administration_login.css">
+</head>
+<body>
+
+  <div class="login-wrapper">
+    <div class="login-card">
+      
+      <!-- Brand Header -->
+      <div class="brand-header">
+        <div class="brand-icon">
+          <!-- Shield Check SVG -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M9 12l2 2 4-4"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2 class="serif-font">EduVerse</h2>
+          <p>Institution credential console</p>
+        </div>
+      </div>
+
+      <!-- Main Titles -->
+      <h1 class="login-title serif-font">Welcome back</h1>
+      <p class="login-subtitle">Sign in to issue and manage verified academic credentials.</p>
+
+      <!-- Show error message if the backend sends one -->
+      <% if (locals.error) { %>
+        <div style="background-color: #FEE2E2; color: #DC2626; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; text-align: center; border: 1px solid #F87171;">
+          Incorrect password. Please try again.
+        </div>
+      <% } %>
+
+      <!-- Updated Form: Now uses POST and points to our new route -->
+      <form action="/administration_login" method="POST" class="login-form">
+        <div class="input-group">
+          <label for="password">Institution password</label>
+          <input type="password" id="password" name="password" placeholder="Enter password" required>
+        </div>
+
+        <button type="submit" class="btn-login">
+          <!-- Lock SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          Enter console
+        </button>
+      </form>
+
+      <!-- Updated Demo Hint -->
+      <p class="demo-hint">Demo password: nitr769008</p>
+      
+    </div>
+  </div>
+
+</body>
+</html>
