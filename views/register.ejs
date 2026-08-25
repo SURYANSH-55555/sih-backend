@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduVerse - Create Account</title>
+    <style>
+      /* Same CSS as your login page for consistency */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      body {
+        background-color: #f8fafc;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .card {
+        background-color: #111a28;
+        width: 100%;
+        max-width: 440px;
+        padding: 2.5rem 2rem;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      }
+      .header-text {
+        text-align: center;
+        margin-bottom: 1.75rem;
+      }
+      .header-text h1 {
+        color: #ffffff;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+      }
+      .header-text p {
+        color: #94a3b8;
+        font-size: 0.9rem;
+      }
+      .input-group {
+        margin-bottom: 1.25rem;
+      }
+      .input-group label {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+      }
+      .input-group input {
+        width: 100%;
+        background-color: #16202e;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        font-size: 0.9rem;
+        color: #ffffff;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+      }
+      .input-group input::placeholder {
+        color: #64748b;
+      }
+      .input-group input:focus {
+        border-color: #56d8fb;
+        box-shadow: 0 0 0 3px rgba(86, 216, 251, 0.15);
+      }
+      .submit-btn {
+        width: 100%;
+        background: linear-gradient(180deg, #6be0ff 0%, #46cef7 100%);
+        color: #0f172a;
+        border: none;
+        border-radius: 12px;
+        padding: 0.9rem;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.2s ease;
+      }
+      .submit-btn:hover {
+        box-shadow: 0 8px 20px rgba(86, 216, 251, 0.25);
+      }
+      .submit-btn:active {
+        transform: scale(0.98);
+      }
+      .footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #94a3b8;
+        font-size: 0.875rem;
+      }
+      .footer a {
+        color: #63dbfb;
+        text-decoration: underline;
+        font-weight: 600;
+      }
+      #error-message {
+        display: none;
+        color: #ef4444;
+        font-size: 0.875rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        font-weight: 500;
+      }
+      #success-message {
+        display: none;
+        color: #10b981;
+        font-size: 0.875rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="header-text">
+        <h1>Create Account</h1>
+        <p>Register your student profile on EduVerse</p>
+      </div>
+
+      <form id="register-form">
+        <div class="input-group">
+          <label for="fullName">Full Name</label>
+          <input
+            type="text"
+            id="fullName"
+            placeholder="e.g. Utkarsh Tripathi"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="rollNumber">Roll Number</label>
+          <input
+            type="text"
+            id="rollNumber"
+            placeholder="e.g. 125CH0053"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="••••••••••••"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="••••••••••••"
+            required
+          />
+        </div>
+
+        <div id="error-message"></div>
+        <div id="success-message"></div>
+
+        <button type="submit" class="submit-btn">Register</button>
+      </form>
+
+      <div class="footer">
+        Already have an account? <a href="/login">Sign In</a>
+      </div>
+    </div>
+
+    <script>
+      const registerForm = document.getElementById("register-form");
+      const errorMsg = document.getElementById("error-message");
+      const successMsg = document.getElementById("success-message");
+
+      registerForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        errorMsg.style.display = "none";
+        successMsg.style.display = "none";
+
+        const fullName = document.getElementById("fullName").value;
+        const rollNumber = document.getElementById("rollNumber").value;
+        const password = document.getElementById("password").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+
+        if (password !== confirmPassword) {
+          errorMsg.innerText = "Passwords do not match!";
+          errorMsg.style.display = "block";
+          return;
+        }
+
+        try {
+          const response = await fetch("/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fullName,
+              rollNumber,
+              password,
+              confirmPassword,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            successMsg.innerText =
+              "Account created successfully! Redirecting...";
+            successMsg.style.display = "block";
+            setTimeout(() => {
+              window.location.href = data.redirectUrl;
+            }, 1500);
+          } else {
+            errorMsg.innerText = data.message || "Registration failed!";
+            errorMsg.style.display = "block";
+          }
+        } catch (error) {
+          console.error("Registration failed", error);
+          errorMsg.innerText = "Something went wrong connecting to the server.";
+          errorMsg.style.display = "block";
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -166,6 +166,16 @@
         font-weight: 600;
       }
 
+      /* Error Message Styling */
+      #error-message {
+        display: none;
+        color: #ef4444;
+        font-size: 0.875rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        font-weight: 500;
+      }
+
       /* Full Screen Transition Overlay */
       #transition-overlay {
         display: none;
@@ -211,8 +221,8 @@
         <p>Enter your credentials to access your dashboard</p>
       </div>
 
-      <!-- Configured to submit via POST to /login route -->
-      <form action="/login" method="POST">
+      <!-- Updated form to have an ID, action and method handled by JS -->
+      <form id="login-form">
         <div class="input-group">
           <label for="login-id">Login ID</label>
           <input
@@ -257,11 +267,14 @@
           </div>
         </div>
 
+        <!-- Hidden container for wrong password messages -->
+        <div id="error-message"></div>
+
         <button type="submit" class="submit-btn">Sign In</button>
       </form>
 
       <div class="footer">
-        New to EduVerse? <a href="#">Create an Account</a>
+        New to EduVerse? <a href="/register">Create an Account</a>
       </div>
     </div>
 
@@ -287,24 +300,56 @@
         pwd.type = pwd.type === "password" ? "text" : "password";
       }
 
-      const loginForm = document.querySelector("form");
+      const loginForm = document.getElementById("login-form");
       const overlay = document.getElementById("transition-overlay");
+      const errorMsg = document.getElementById("error-message");
 
-      loginForm.addEventListener("submit", function (e) {
+      loginForm.addEventListener("submit", async function (e) {
         e.preventDefault(); // Stop instant form submission
 
-        // 1. Show the overlay flex container
-        overlay.style.display = "flex";
+        // Hide any previous error messages
+        errorMsg.style.display = "none";
 
-        // 2. Fade in smoothly
-        setTimeout(() => {
-          overlay.style.opacity = "1";
-        }, 10);
+        const loginId = document.getElementById("login-id").value;
+        const password = document.getElementById("password").value;
 
-        // 3. Play animation for 2.5 seconds, then submit the form to the backend
-        setTimeout(() => {
-          loginForm.submit();
-        }, 3000);
+        try {
+          // Ask the backend to verify the credentials
+          const response = await fetch("/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ loginId, password }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            // ✅ Password is correct!
+
+            // 1. Show the overlay flex container
+            overlay.style.display = "flex";
+
+            // 2. Fade in smoothly
+            setTimeout(() => {
+              overlay.style.opacity = "1";
+            }, 10);
+
+            // 3. Play animation for 2.5 seconds, then safely redirect to the dashboard URL provided by the server
+            setTimeout(() => {
+              window.location.href = data.redirectUrl;
+            }, 2500);
+          } else {
+            // ❌ Password is wrong! Show error text and do NOT play animation.
+            errorMsg.innerText = data.message || "Invalid credentials!";
+            errorMsg.style.display = "block";
+          }
+        } catch (error) {
+          console.error("Login request failed", error);
+          errorMsg.innerText = "Something went wrong connecting to the server.";
+          errorMsg.style.display = "block";
+        }
       });
     </script>
   </body>

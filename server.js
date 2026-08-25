@@ -1,17 +1,55 @@
+require("dotenv").config();
 const express = require("express");
+const session = require("express-session");
 const crypto = require("crypto");
+const { Pool } = require("pg");
+const bcrypt = require("bcrypt");
+const path = require("path");
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware to parse form data
+// ==========================================
+// 1. DATABASE & SECURE SESSION SETUP
+// ==========================================
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// 1. Setup EJS and Public folder
 app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
-// In-memory store for revocation demo
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "fallback_secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
+  }),
+);
+
+// --- REUSABLE MIDDLEWARE FOR ROLE PROTECTION ---
+function requireRole(role) {
+  return (req, res, next) => {
+    if (req.session && req.session.user && req.session.user.role === role) {
+      return next();
+    }
+    if (role === "admin") {
+      return res.redirect("/administration_login");
+    }
+    res.redirect("/login");
+  };
+}
+
+// ==========================================
+// 2. ORIGINAL IN-MEMORY DEMO DATA
+// ==========================================
 let revokedList = [
   {
     id: "CERT-REV991",
@@ -33,12 +71,14 @@ let revokedList = [
   },
 ];
 
-// 2. Render the Landing Page
+// ==========================================
+// 3. PUBLIC PUBLIC & LANDING ROUTES
+// ==========================================
 app.get("/", (req, res) => {
   res.render("index");
 });
 
-// 3. The Cryptographic Blender (Test Route)
+// The Cryptographic Blender (Test Route)
 app.get("/test-hash", function (req, res) {
   const student = {
     name: "Rahul Kumar",
@@ -60,69 +100,93 @@ app.get("/test-hash", function (req, res) {
   });
 });
 
-// Show the Administration Login Page
+// ==========================================
+// 4. SECURE ADMINISTRATION LOGIN
+// ==========================================
 app.get("/administration_login", (req, res) => {
-  // We check if the URL has ?error=true so we can show a wrong password warning
   const showError = req.query.error === "true";
   res.render("administration_login", { error: showError });
 });
 
-// Process the Login Attempt
-app.post("/administration_login", (req, res) => {
-  const enteredPassword = req.body.password;
+app.post("/administration_login", async (req, res) => {
+  const { password } = req.body;
 
-  // Check if the password matches exactly
-  if (enteredPassword === "nitr769008") {
-    // Success! Send them to the dashboard
-    res.redirect("/dashboard");
-  } else {
-    // Failed! Send them back to the login page with an error flag
+  try {
+    const query = "SELECT * FROM users WHERE role = $1";
+    const result = await pool.query(query, ["admin"]);
+
+    if (result.rows.length === 0) {
+      return res.redirect("/administration_login?error=true");
+    }
+
+    const admin = result.rows[0];
+    const match = await bcrypt.compare(password, admin.password_hash);
+
+    if (!match) {
+      return res.redirect("/administration_login?error=true");
+    }
+
+    // Secure Login Success!
+    req.session.regenerate((err) => {
+      if (err) return res.status(500).send("Server error.");
+      req.session.user = {
+        id: admin.id,
+        loginId: admin.login_id,
+        role: admin.role,
+      };
+
+      req.session.save((err) => {
+        if (err) return res.status(500).send("Server error.");
+        res.redirect("/dashboard");
+      });
+    });
+  } catch (err) {
+    console.error("Database error during admin login:", err);
     res.redirect("/administration_login?error=true");
   }
 });
 
-// 4. Dashboard & Admin Routes
-app.get("/dashboard", (req, res) => {
+// ==========================================
+// 5. PROTECTED ADMIN DASHBOARD ROUTES
+// ==========================================
+app.get("/dashboard", requireRole("admin"), (req, res) => {
   res.render("overview", { activePage: "overview" });
 });
 
-// Issue & Verify Page (GET)
-app.get("/dashboard/issue", (req, res) => {
-  res.render("issue", {
-    activePage: "issue",
-    credentialData: null,
-  });
+app.get("/dashboard/issue", requireRole("admin"), (req, res) => {
+  res.render("issue", { activePage: "issue", credentialData: null });
 });
 
-// Issue Page Form Submission (POST) - Updated to handle both /generate-hash and /dashboard/issue
-app.post(["/generate-hash", "/dashboard/issue"], (req, res) => {
-  const { studentName, rollNo, gradYear, degree, branch } = req.body;
+app.post(
+  ["/generate-hash", "/dashboard/issue"],
+  requireRole("admin"),
+  (req, res) => {
+    const { studentName, rollNo, gradYear, degree, branch } = req.body;
 
-  const rawData = `${studentName}|${rollNo}|${degree}|${branch}|${gradYear}`;
-  const documentHash = crypto
-    .createHash("sha256")
-    .update(rawData)
-    .digest("hex");
-  const randomHex = crypto.randomBytes(2).toString("hex").toUpperCase();
-  const certificateID = `CERT-${randomHex}`;
+    const rawData = `${studentName}|${rollNo}|${degree}|${branch}|${gradYear}`;
+    const documentHash = crypto
+      .createHash("sha256")
+      .update(rawData)
+      .digest("hex");
+    const randomHex = crypto.randomBytes(2).toString("hex").toUpperCase();
+    const certificateID = `CERT-${randomHex}`;
 
-  res.render("issue", {
-    activePage: "issue",
-    credentialData: {
-      id: certificateID,
-      studentName: studentName,
-      hash: documentHash,
-    },
-  });
-});
+    res.render("issue", {
+      activePage: "issue",
+      credentialData: {
+        id: certificateID,
+        studentName: studentName,
+        hash: documentHash,
+      },
+    });
+  },
+);
 
-// Verification Profile Page (GET)
-app.get("/dashboard/verify", (req, res) => {
+app.get("/dashboard/verify", requireRole("admin"), (req, res) => {
   res.render("verify", { activePage: "verify", verifiedData: null });
 });
 
-// Verification Action (POST)
-app.post("/verify-action", (req, res) => {
+app.post("/verify-action", requireRole("admin"), (req, res) => {
   const selectedCertId = req.body.certId;
   let mockVerifiedData;
 
@@ -156,18 +220,12 @@ app.post("/verify-action", (req, res) => {
   });
 });
 
-// Revocation Registry Page (GET)
-app.get("/dashboard/revoke", (req, res) => {
-  res.render("revoke", {
-    activePage: "revoke",
-    revokedList: revokedList,
-  });
+app.get("/dashboard/revoke", requireRole("admin"), (req, res) => {
+  res.render("revoke", { activePage: "revoke", revokedList: revokedList });
 });
 
-// Revocation Action Form Submission (POST)
-app.post("/revoke-action", (req, res) => {
+app.post("/revoke-action", requireRole("admin"), (req, res) => {
   const { certId, reason } = req.body;
-
   const existingIndex = revokedList.findIndex((item) => item.id === certId);
 
   if (existingIndex === -1) {
@@ -189,33 +247,133 @@ app.post("/revoke-action", (req, res) => {
       reason: reason || "Academic misconduct discovered",
     });
   }
-
   res.redirect("/dashboard/revoke");
 });
 
-// 5. Student Portal & Login Routes
-
-// Render the Student Login Page (GET)
-app.get("/login", (req, res) => {
-  res.render("login", { activePage: "login" });
+// 1. Serve the Create Account page
+app.get("/register", (req, res) => {
+  res.render("register");
 });
 
-// Handle Student Login Submission (POST)
-app.post("/login", (req, res) => {
-  const { loginId, password } = req.body;
+// 2. Handle the Registration Form Submission
+app.post("/register", async (req, res) => {
+  const { fullName, rollNumber, password, confirmPassword } = req.body;
 
-  if (!loginId || !password) {
-    return res.redirect("/login");
+  // Security check: Make sure passwords match before hitting the database
+  if (password !== confirmPassword) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Passwords do not match!" });
   }
 
+  try {
+    // Check if the Roll Number already exists in the database
+    const checkUser = await pool.query(
+      "SELECT * FROM users WHERE login_id = $1",
+      [rollNumber],
+    );
+
+    if (checkUser.rows.length > 0) {
+      // User exists! Change nothing and send an error back.
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "This Roll Number is already registered!",
+        });
+    }
+
+    // User is new! Encrypt the password and save them.
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    await pool.query(
+      `
+      INSERT INTO users (login_id, password_hash, role, full_name) 
+      VALUES ($1, $2, $3, $4);
+    `,
+      [rollNumber, hashedPassword, "student", fullName],
+    );
+
+    // Send a success signal back to the frontend
+    res.status(200).json({ success: true, redirectUrl: "/login" });
+  } catch (err) {
+    console.error("Registration error:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "Server error during registration." });
+  }
+});
+
+// ==========================================
+// 6. SECURE STUDENT LOGIN & PORTAL
+// ==========================================
+app.get("/login", (req, res) => {
+  res.render("login", { activePage: "login", error: null });
+});
+
+app.post("/login", async (req, res) => {
+  const { loginId, password } = req.body;
+
+  try {
+    const query = "SELECT * FROM users WHERE login_id = $1 AND role = $2";
+    const result = await pool.query(query, [loginId, "student"]);
+
+    if (result.rows.length === 0) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid Student ID or password." });
+    }
+
+    const user = result.rows[0];
+    const match = await bcrypt.compare(password, user.password_hash);
+
+    if (!match) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid Student ID or password." });
+    }
+
+    req.session.regenerate((err) => {
+      if (err)
+        return res
+          .status(500)
+          .json({ success: false, message: "Server error." });
+
+      req.session.user = {
+        id: user.id,
+        loginId: user.login_id,
+        role: user.role,
+      };
+
+      req.session.save((err) => {
+        if (err)
+          return res
+            .status(500)
+            .json({ success: false, message: "Server error." });
+        // Send a JSON success signal and the correct student portal URL
+        res.status(200).json({ success: true, redirectUrl: "/student-portal" });
+      });
+    });
+  } catch (err) {
+    console.error("Database error during student login:", err);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+// Protected Student Portal
+app.get("/student-portal", requireRole("student"), (req, res) => {
+  // Using the session loginId to show mock data so your EJS doesn't break
+  const currentLoginId = req.session.user.loginId || "Unknown";
+
   let studentData = {
-    name: loginId,
-    rollNo: "125CH0053",
+    name: currentLoginId,
+    rollNo: currentLoginId,
     branch: "Chemical Engineering",
     gradYear: "2029",
   };
 
-  if (loginId.toLowerCase().includes("rahul")) {
+  if (currentLoginId.toLowerCase().includes("rahul")) {
     studentData = {
       name: "Rahul Kumar",
       rollNo: "2021CS0456",
@@ -227,19 +385,18 @@ app.post("/login", (req, res) => {
   res.render("student-portal", { student: studentData });
 });
 
-// Fallback direct route for student portal
-app.get("/student-portal", (req, res) => {
-  const studentData = {
-    name: "Utkarsh Tripathi",
-    rollNo: "125CH0053",
-    branch: "Chemical Engineering",
-    gradYear: "2029",
-  };
-
-  res.render("student-portal", { student: studentData });
+// ==========================================
+// 7. SECURE LOGOUT ROUTE
+// ==========================================
+app.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/login");
+  });
 });
 
-// 6. Start the Server
+// ==========================================
+// 8. START SERVER
+// ==========================================
 app.listen(port, () => {
-  console.log(`Server is awake and listening on port ${port}`);
+  console.log(`EduVerse Secure Server is awake and listening on port ${port}`);
 });
