@@ -72,7 +72,7 @@ let revokedList = [
 ];
 
 // ==========================================
-// 3. PUBLIC PUBLIC & LANDING ROUTES
+// 3. PUBLIC & LANDING ROUTES
 // ==========================================
 app.get("/", (req, res) => {
   res.render("index");
@@ -160,7 +160,7 @@ app.get("/dashboard/issue", requireRole("admin"), (req, res) => {
 app.post(
   ["/generate-hash", "/dashboard/issue"],
   requireRole("admin"),
-  (req, res) => {
+  async (req, res) => {
     const { studentName, rollNo, gradYear, degree, branch } = req.body;
 
     const rawData = `${studentName}|${rollNo}|${degree}|${branch}|${gradYear}`;
@@ -171,14 +171,35 @@ app.post(
     const randomHex = crypto.randomBytes(2).toString("hex").toUpperCase();
     const certificateID = `CERT-${randomHex}`;
 
-    res.render("issue", {
-      activePage: "issue",
-      credentialData: {
-        id: certificateID,
-        studentName: studentName,
-        hash: documentHash,
-      },
-    });
+    try {
+      // 1. INJECT the certificate permanently into your new Postgres table
+      await pool.query(
+        `INSERT INTO certificates (cert_id, student_name, roll_no, degree, branch, grad_year, document_hash) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          certificateID,
+          studentName,
+          rollNo,
+          degree,
+          branch,
+          gradYear,
+          documentHash,
+        ],
+      );
+
+      // 2. Show the Admin the successful result on the screen
+      res.render("issue", {
+        activePage: "issue",
+        credentialData: {
+          id: certificateID,
+          studentName: studentName,
+          hash: documentHash,
+        },
+      });
+    } catch (err) {
+      console.error("Database error during certificate issuance:", err);
+      res.status(500).send("Error saving certificate to the database.");
+    }
   },
 );
 
@@ -275,12 +296,10 @@ app.post("/register", async (req, res) => {
 
     if (checkUser.rows.length > 0) {
       // User exists! Change nothing and send an error back.
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "This Roll Number is already registered!",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "This Roll Number is already registered!",
+      });
     }
 
     // User is new! Encrypt the password and save them.
