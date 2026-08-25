@@ -5,7 +5,7 @@ const crypto = require("crypto");
 const { Pool } = require("pg");
 const bcrypt = require("bcrypt");
 const path = require("path");
-
+const PDFDocument = require("pdfkit");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -380,28 +380,106 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Protected Student Portal
-app.get("/student-portal", requireRole("student"), (req, res) => {
-  // Using the session loginId to show mock data so your EJS doesn't break
-  const currentLoginId = req.session.user.loginId || "Unknown";
+// Protected Student Portal (Now fetching REAL data)
+app.get("/student-portal", requireRole("student"), async (req, res) => {
+  const currentRollNo = req.session.user.loginId; // e.g., 125CH0053
 
-  let studentData = {
-    name: currentLoginId,
-    rollNo: currentLoginId,
-    branch: "Chemical Engineering",
-    gradYear: "2029",
-  };
+  try {
+    // 1. Fetch the student's personal info
+    const userResult = await pool.query(
+      "SELECT full_name FROM users WHERE login_id = $1",
+      [currentRollNo],
+    );
+    const fullName =
+      userResult.rows.length > 0 ? userResult.rows[0].full_name : currentRollNo;
 
-  if (currentLoginId.toLowerCase().includes("rahul")) {
-    studentData = {
-      name: "Rahul Kumar",
-      rollNo: "2021CS0456",
+    // 2. Fetch all real certificates belonging strictly to this roll number
+    const certResult = await pool.query(
+      "SELECT * FROM certificates WHERE roll_no = $1 ORDER BY issue_date DESC",
+      [currentRollNo],
+    );
+
+    const studentData = {
+      name: fullName,
+      rollNo: currentRollNo,
       branch: "Chemical Engineering",
-      gradYear: "2027",
+      gradYear: "2029",
     };
-  }
 
-  res.render("student-portal", { student: studentData });
+    // 3. Send the real database arrays to the frontend EJS file
+    res.render("student-portal", {
+      student: studentData,
+      certificates: certResult.rows, // Passes the real docs to the screen!
+    });
+  } catch (err) {
+    console.error("Database error loading portal:", err);
+    res.status(500).send("Error loading your dashboard.");
+  }
+});
+
+// The Dynamic PDF Generator Route
+app.get("/download/:cert_id", requireRole("student"), async (req, res) => {
+  const certId = req.params.cert_id;
+  const currentRollNo = req.session.user.loginId;
+
+  try {
+    // 1. Security Check: Ensure this certificate belongs to the logged-in student
+    const certQuery = await pool.query(
+      "SELECT * FROM certificates WHERE cert_id = $1 AND roll_no = $2",
+      [certId, currentRollNo],
+    );
+
+    if (certQuery.rows.length === 0) {
+      return res.status(403).send("Unauthorized Access or Document Not Found");
+    }
+
+    const cert = certQuery.rows[0];
+
+    // 2. Fire up the PDF Engine
+    const doc = new PDFDocument({ layout: "landscape", size: "A4" });
+
+    // Tell the browser to download it instead of just displaying code
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${cert.cert_id}.pdf`,
+    );
+    doc.pipe(res);
+
+    // 3. Draw the Certificate Design
+    doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).stroke(); // Outer border
+    doc.moveDown(2);
+    doc
+      .fontSize(35)
+      .text("National Institute of Technology", { align: "center" });
+    doc.moveDown(1);
+    doc.fontSize(20).text("Official Degree Certificate", { align: "center" });
+    doc.moveDown(2);
+    doc
+      .fontSize(16)
+      .text(`This certifies that ${cert.student_name}`, { align: "center" });
+    doc.text(`Roll Number: ${cert.roll_no}`, { align: "center" });
+    doc.moveDown(1);
+    doc.text(`Has successfully completed the requirements for the degree of`, {
+      align: "center",
+    });
+    doc
+      .fontSize(18)
+      .text(`${cert.degree} in ${cert.branch}`, { align: "center" });
+    doc.moveDown(3);
+
+    // Add the tamper-proof cryptographic hashes at the bottom
+    doc
+      .fontSize(10)
+      .fillColor("gray")
+      .text(`Document Hash: ${cert.document_hash}`, { align: "center" });
+    doc.text(`Digital Verification ID: ${cert.cert_id}`, { align: "center" });
+
+    doc.end(); // Finish building and send to student
+  } catch (err) {
+    console.error("PDF generation error:", err);
+    res.status(500).send("Error generating document.");
+  }
 });
 
 // ==========================================
