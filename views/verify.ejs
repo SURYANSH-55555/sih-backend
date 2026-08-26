@@ -1,59 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EduVerse | Verification Profile</title>
-  
-  <!-- Links to your specific Verify CSS file -->
   <link rel="stylesheet" href="/css/pages/verify.css">
 </head>
+
 <body>
 
-  <!-- Top Dark Header Navigation -->
+  <!-- Top Dark Header Navigation (External Public View) -->
   <header>
     <div class="brand-section">
       <div class="brand-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
       </div>
       <div class="brand-text">
         <h2>EduVerse</h2>
-        <span>Credential Console</span>
+        <span>Public Verification Portal</span>
       </div>
-    </div>
-
-    <!-- Corrected Top Navigation Links -->
-    <ul class="nav-links">
-      <li>
-        <a href="/dashboard">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Overview
-        </a>
-      </li>
-      <li>
-        <a href="/dashboard/issue">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Issue & Verify
-        </a>
-      </li>
-      <li>
-        <a href="/dashboard/verify" class="active">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-          Verification Profile
-        </a>
-      </li>
-      <li>
-        <a href="/dashboard/revoke">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-          Revocation Registry
-        </a>
-      </li>
-    </ul>
-
-    <div class="header-right">
-      <button class="btn-logout">Logout</button>
     </div>
   </header>
 
@@ -61,180 +30,110 @@
   <main class="dashboard-content">
     <div class="page-header">
       <h1>Verification Profile</h1>
-      <p>The verified credential a recruiter sees after scanning.</p>
+      <p>Cryptographically verify academic credentials against the immutable database.</p>
     </div>
 
+    <!-- 2-Column Grid Wrapper matching the Issue Page -->
     <div class="verify-grid">
 
-      <!-- LEFT COLUMN: Scanner, QR, Tamper Box & Button -->
-      <div class="verify-sidebar">
-        <form action="/verify-action" method="POST">
+      <!-- LEFT COLUMN: Search Card -->
+      <div class="card">
+        <span class="card-badge">PUBLIC VERIFICATION</span>
+        <h2 class="card-title">Scan a Credential</h2>
 
-          <!-- Scan Card with Nested QR Code -->
-          <div class="card">
-            <h3 class="card-title"><span>⛶</span> Scan a Credential</h3>
-            <p class="card-desc">Pick a certificate to simulate scanning its QR code.</p>
-
-            <div class="input-group">
-              <label>Credential</label>
-              <select name="certId" id="certSelect" required onchange="revealScanUI()">
-                <option value="" disabled <%= !locals.verifiedData ? 'selected' : '' %>>Select a certificate...</option>
-                <option value="CERT-KQ26MQ" <%= locals.verifiedData && locals.verifiedData.id === 'CERT-KQ26MQ' ? 'selected' : '' %>>CERT-KQ26MQ — Utkarsh Tripathi</option>
-                <option value="CERT-L55EFV" <%= locals.verifiedData && locals.verifiedData.id === 'CERT-L55EFV' ? 'selected' : '' %>>CERT-L55EFV — Jane Doe</option>
-              </select>
-            </div>
-
-            <!-- QR Code container -->
-            <div id="hiddenQR" class="hidden-ui" <%= locals.verifiedData ? 'style="display: block;"' : '' %>>
-              <div class="mock-qr-code">
-                <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=<%= locals.verifiedData ? verifiedData.id : 'CERT-KQ26MQ' %>" alt="QR Code">
-              </div>
-            </div>
+        <form id="verifyForm" action="/verify-action" method="POST">
+          <div class="input-group">
+            <label>Certificate ID</label>
+            <input type="text" name="certId" placeholder="Enter ID (e.g. CERT-XXXX)" required
+              value="<%= typeof prefillId !== 'undefined' && prefillId ? prefillId : (typeof verifiedData !== 'undefined' && verifiedData && !verifiedData.notFound ? verifiedData.id : '') %>">
           </div>
-
-          <!-- Tamper Demo Box -->
-          <div id="hiddenTamper" class="card tamper-demo-card hidden-ui" <%= locals.verifiedData ? 'style="display: block;"' : '' %>>
-            <div class="tamper-header">DEMO · SIMULATE TAMPERING</div>
-            <p class="tamper-desc">Change the branch to forge the record, then re-scan the <strong>same</strong> QR code.</p>
-
-            <div class="input-group">
-              <label>Branch (issued: <%= locals.verifiedData ? verifiedData.branch : 'Chemical Engineering' %>)</label>
-              <input type="text" name="tamperBranch" placeholder="Computer Science">
-            </div>
-          </div>
-
-          <!-- Scan & Verify Button -->
-          <button type="submit" class="btn-verify-submit">⛶ Scan & Verify</button>
+          <button type="submit" class="btn-submit">Look up</button>
         </form>
+
+        <p class="helper-text">Scan the QR code on a certificate, or enter its ID manually.</p>
       </div>
 
-      <!-- RIGHT COLUMN: Verification Results -->
-      <div class="verify-results">
-        <% if (!locals.verifiedData) { %>
-          <div class="card" style="text-align: center; padding: 4rem 2rem; color: #94A3B8;">
-            <p style="font-size: 0.9rem; font-weight: 500;">Select a credential on the left and click <strong>Scan & Verify</strong> to view the real-time cryptographic audit.</p>
-          </div>
-        <% } else { %>
+      <!-- RIGHT COLUMN: Results Display Card -->
+      <div class="card">
+        <span class="card-badge">OUTPUT PREVIEW</span>
+        <h3 class="card-title">Verification Result</h3>
 
-          <!-- Success Banner -->
-          <div class="verify-success-banner">
-            <div class="success-icon-wrapper">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            </div>
-            <div class="success-text-content">
-              <h4>Verification Successful</h4>
-              <p>Data is intact and the institution signature is valid.</p>
-            </div>
+        <!-- STATE 1: Empty -->
+        <% if (typeof verifiedData==='undefined' || !verifiedData) { %>
+          <div class="empty-state-box">
+            <div class="qr-icon">🛡️</div>
+            <p>Enter a certificate ID on the left to securely verify the credential.</p>
           </div>
 
-          <!-- Verified Credential Details Card -->
-          <div class="card">
-            <div class="card-top-bar">
-              <h4 class="card-title">🎓 Verified Credential</h4>
-              <span class="issued-by">🏢 Issued by XYZ University</span>
+          <!-- STATE 2: Not Found -->
+          <% } else if (verifiedData.notFound) { %>
+            <div class="empty-state-box error-state">
+              <div class="qr-icon">⚠️</div>
+              <p style="font-weight: 600;">Credential Not Found</p>
+              <p style="font-size: 0.85rem; margin-top: 5px;">There is no record of this certificate ID in the database.
+              </p>
             </div>
 
-            <div class="data-grid">
-              <div class="data-item">
-                <label>STUDENT NAME</label>
-                <div class="val"><%= verifiedData.studentName %></div>
-              </div>
-              <div class="data-item">
-                <label>ROLL NUMBER</label>
-                <div class="val"><%= verifiedData.rollNo %></div>
-              </div>
-              <div class="data-item">
-                <label>CERTIFICATE ID</label>
-                <div class="val"><%= verifiedData.id %></div>
-              </div>
-              <div class="data-item">
-                <label>DEGREE</label>
-                <div class="val"><%= verifiedData.degree %></div>
-              </div>
-              <div class="data-item">
-                <label>BRANCH</label>
-                <div class="val"><%= verifiedData.branch %></div>
-              </div>
-              <div class="data-item">
-                <label>GRADUATION YEAR</label>
-                <div class="val"><%= verifiedData.gradYear %></div>
-              </div>
-            </div>
-          </div>
+            <!-- STATE 3: Success or Tampered -->
+            <% } else { %>
+              <div class="success-state-box">
 
-          <!-- Bottom Row: Fingerprint & Audit Checks -->
-          <div class="verify-bottom-row">
+                <% if (verifiedData.isMatch) { %>
+                  <div class="status-badge success">✅ Verified & Authentic</div>
+                  <% } else { %>
+                    <div class="status-badge error">❌ Tamper Alert: Invalid Credential</div>
+                    <% } %>
 
-            <!-- SHA-256 Fingerprint Card -->
-            <div class="card" style="margin-bottom: 0;">
-              <h4 class="card-title" style="margin-bottom: 1rem;">🔏 SHA-256 Fingerprint</h4>
+                      <div class="data-row"><strong>Name:</strong>
+                        <%= verifiedData.studentName %>
+                      </div>
+                      <div class="data-row"><strong>Cert ID:</strong>
+                        <%= verifiedData.id %>
+                      </div>
+                      <div class="data-row"><strong>Degree:</strong>
+                        <%= verifiedData.degree %>
+                      </div>
+                      <div class="data-row">
+                        <strong>Branch:</strong>
+                        <span
+                          style="color: <%= verifiedData.isMatch ? 'inherit' : '#dc2626' %>; font-weight: <%= verifiedData.isMatch ? 'normal' : '600' %>;">
+                          <%= verifiedData.branch %>
+                        </span>
+                      </div>
+                      <div class="data-row"><strong>Grad Year:</strong>
+                        <%= verifiedData.gradYear %>
+                      </div>
 
-              <div class="hash-block">
-                <label>On record (at issuance)</label>
-                <div class="hash-box grey-box"><%= verifiedData.originalHash %></div>
+                      <div class="hash-display mt-4">
+                        <div class="hash-label">Original Database Hash:</div>
+                        <div class="hash-string">
+                          <%= verifiedData.originalHash %>
+                        </div>
+                      </div>
+
+                      <div class="hash-display"
+                        style="background-color: <%= verifiedData.isMatch ? '#f8fafc' : '#fef2f2' %>; border-color: <%= verifiedData.isMatch ? '#e2e8f0' : '#fca5a5' %>;">
+                        <div class="hash-label">Calculated Verification Hash:</div>
+                        <div class="hash-string" style="color: <%= verifiedData.isMatch ? '#0f172a' : '#dc2626' %>;">
+                          <%= verifiedData.recomputedHash %>
+                        </div>
+                      </div>
               </div>
-
-              <div class="hash-block">
-                <label>Recomputed (from scan)</label>
-                <div class="hash-box green-box"><%= verifiedData.recomputedHash %></div>
-              </div>
-
-              <p class="hash-match-text">Fingerprints match — data is unchanged.</p>
-            </div>
-
-            <!-- Verification Checks Card -->
-            <div class="card" style="margin-bottom: 0;">
-              <h4 class="card-title" style="margin-bottom: 1rem;">🛡️ Verification Checks</h4>
-              <ul class="checks-list">
-                <li>
-                  <div class="check-left">
-                    <div class="check-icon-bg">🔄</div>
-                    <span>Hash recalculated & matches</span>
-                  </div>
-                  <span class="pass">PASS</span>
-                </li>
-                <li>
-                  <div class="check-left">
-                    <div class="check-icon-bg">🔗</div>
-                    <span>Hash-chain link intact</span>
-                  </div>
-                  <span class="pass">PASS</span>
-                </li>
-                <li>
-                  <div class="check-left">
-                    <div class="check-icon-bg">🔑</div>
-                    <span>Institution signature valid</span>
-                  </div>
-                  <span class="pass">PASS</span>
-                </li>
-                <li>
-                  <div class="check-left">
-                    <div class="check-icon-bg">⏱️</div>
-                    <span>Not in revocation registry</span>
-                  </div>
-                  <span class="pass">PASS</span>
-                </li>
-              </ul>
-            </div>
-
-          </div>
-
-        <% } %>
+              <% } %>
       </div>
 
     </div>
   </main>
 
-  <script>
-    function revealScanUI() {
-      document.getElementById('hiddenQR').style.display = 'block';
-      document.getElementById('hiddenTamper').style.display = 'block';
+  <!-- MAGIC AUTO-SUBMIT SCRIPT FOR QR SCANS -->
+  <% if (typeof prefillId !=='undefined' && prefillId && (typeof verifiedData==='undefined' || !verifiedData)) { %>
+    <script>
+      window.onload = function () {
+        document.getElementById("verifyForm").submit();
+      };
+    </script>
+    <% } %>
 
-      const certId = document.getElementById('certSelect').value;
-      document.getElementById('qrImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + certId;
-    }
-  </script>
 </body>
+
 </html>

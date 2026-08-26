@@ -6,6 +6,7 @@ const { Pool } = require("pg");
 const bcrypt = require("bcrypt");
 const path = require("path");
 const PDFDocument = require("pdfkit");
+const QRCode = require("qrcode"); // Added QR Code Engine
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -172,7 +173,7 @@ app.post(
     const certificateID = `CERT-${randomHex}`;
 
     try {
-      // 1. INJECT the certificate permanently into your new Postgres table
+      // 1. INJECT the certificate permanently into your Postgres table
       await pool.query(
         `INSERT INTO certificates (cert_id, student_name, roll_no, degree, branch, grad_year, document_hash) 
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
@@ -187,13 +188,19 @@ app.post(
         ],
       );
 
-      // 2. Show the Admin the successful result on the screen
+      // 2. Generate Real QR Code linking to the scanner
+      // NOTE: Update this URL to your real Railway URL!
+      const verificationUrl = `https://eduverse-portal.up.railway.app/dashboard/verify?id=${certificateID}`;
+      const qrCodeImage = await QRCode.toDataURL(verificationUrl);
+
+      // 3. Show the Admin the successful result on the screen
       res.render("issue", {
         activePage: "issue",
         credentialData: {
           id: certificateID,
           studentName: studentName,
           hash: documentHash,
+          qrCode: qrCodeImage, // New dynamic image!
         },
       });
     } catch (err) {
@@ -203,43 +210,71 @@ app.post(
   },
 );
 
-app.get("/dashboard/verify", requireRole("admin"), (req, res) => {
-  res.render("verify", { activePage: "verify", verifiedData: null });
+// ==========================================
+// PUBLIC VERIFICATION PORTAL (Unlocked!)
+// ==========================================
+
+// 1. GET Route: Loads the public page when QR is scanned (Notice requireRole is GONE)
+app.get("/dashboard/verify", (req, res) => {
+  const prefillId = req.query.id || null; // Catches the ID from the QR code scan
+  res.render("verify", { verifiedData: null, prefillId: prefillId });
 });
 
-app.post("/verify-action", requireRole("admin"), (req, res) => {
+// 2. POST Route: Handles the "Look up" button & Auto-submit
+app.post("/verify-action", async (req, res) => {
   const selectedCertId = req.body.certId;
-  let mockVerifiedData;
 
-  if (selectedCertId === "CERT-KQ26MQ") {
-    mockVerifiedData = {
-      id: "CERT-KQ26MQ",
-      studentName: "Utkarsh Tripathi",
-      rollNo: "125CH0053",
-      degree: "B.Tech",
-      branch: req.body.tamperBranch || "Chemical Engineering",
-      gradYear: "2029",
-      originalHash: "34c7dae40c985594f91ff1ee...2745db7b5e6f",
-      recomputedHash: "34c7dae40c985594f91ff1ee...2745db7b5e6f",
-    };
-  } else {
-    mockVerifiedData = {
-      id: "CERT-L55EFV",
-      studentName: "Jane Doe",
-      rollNo: "2020CS0112",
-      degree: "B.S. Computer Science",
-      branch: req.body.tamperBranch || "Computer Science",
-      gradYear: "2026",
-      originalHash: "640b259edc9c4946e363686b...e2e202b34417",
-      recomputedHash: "640b259edc9c4946e363686b...e2e202b34417",
-    };
+  try {
+    // 1. Search the live database
+    const result = await pool.query(
+      "SELECT * FROM certificates WHERE cert_id = $1",
+      [selectedCertId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.render("verify", {
+        verifiedData: { notFound: true, id: selectedCertId },
+        prefillId: selectedCertId, // Keeps their typed ID in the box
+      });
+    }
+
+    const cert = result.rows[0];
+
+    // 2. Recompute the hash right now
+    const rawData = `${cert.student_name}|${cert.roll_no}|${cert.degree}|${cert.branch}|${cert.grad_year}`;
+    const recomputedHash = crypto
+      .createHash("sha256")
+      .update(rawData)
+      .digest("hex");
+
+    // 3. Compare real database hash vs newly computed hash
+    const isMatch = recomputedHash === cert.document_hash;
+
+    // 4. Send the result to the right side of the screen
+    res.render("verify", {
+      verifiedData: {
+        notFound: false,
+        id: cert.cert_id,
+        studentName: cert.student_name,
+        rollNo: cert.roll_no,
+        degree: cert.degree,
+        branch: cert.branch,
+        gradYear: cert.grad_year,
+        originalHash: cert.document_hash,
+        recomputedHash: recomputedHash,
+        isMatch: isMatch, // True = Verified Green, False = Tampered Red
+      },
+      prefillId: selectedCertId,
+    });
+  } catch (err) {
+    console.error("Database error during verification:", err);
+    res.status(500).send("Error verifying certificate.");
   }
-
-  res.render("verify", {
-    activePage: "verify",
-    verifiedData: mockVerifiedData,
-  });
 });
+
+// ==========================================
+// END PUBLIC VERIFICATION ROUTES
+// ==========================================
 
 app.get("/dashboard/revoke", requireRole("admin"), (req, res) => {
   res.render("revoke", { activePage: "revoke", revokedList: revokedList });
