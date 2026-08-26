@@ -199,8 +199,12 @@ app.post(
         credentialData: {
           id: certificateID,
           studentName: studentName,
+          rollNo: rollNo, // <-- Added this
+          degree: degree, // <-- Added this
+          branch: branch, // <-- Added this
+          gradYear: gradYear, // <-- Added this
           hash: documentHash,
-          qrCode: qrCodeImage, // New dynamic image!
+          qrCode: qrCodeImage,
         },
       });
     } catch (err) {

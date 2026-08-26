@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <!-- Corrected Top Navigation Links -->
+    <!-- Top Navigation Links -->
     <ul class="nav-links">
       <li>
         <a href="/dashboard">
@@ -61,7 +61,9 @@
     </ul>
 
     <div class="header-right">
-      <button class="btn-logout">Logout</button>
+      <a href="/logout" style="text-decoration: none;">
+        <button class="btn-logout">Logout</button>
+      </a>
     </div>
   </header>
 
@@ -84,23 +86,26 @@
         <form action="/generate-hash" method="POST">
           <div class="input-group">
             <label>Student Name</label>
-            <input type="text" name="studentName" placeholder="Enter student name..." required>
+            <input type="text" name="studentName" placeholder="Enter student name..." required 
+                   value="<%= locals.credentialData ? credentialData.studentName : '' %>">
           </div>
 
           <div class="form-row">
             <div class="input-group">
               <label>Roll Number</label>
-              <input type="text" name="rollNo" placeholder="Enter roll number..." required>
+              <input type="text" name="rollNo" placeholder="Enter roll number..." required
+                     value="<%= locals.credentialData ? credentialData.rollNo : '' %>">
             </div>
             <div class="input-group">
               <label>Degree</label>
+              <% 
+                const degrees = ["B.E.", "B.Tech", "B.Tech + M.Tech", "MBA", "M.Tech"];
+              %>
               <select name="degree" required>
-                <option value="" disabled selected>Select degree...</option>
-                <option value="B.E.">B.E.</option>
-                <option value="B.Tech">B.Tech</option>
-                <option value="B.Tech + M.Tech">B.Tech + M.Tech</option>
-                <option value="MBA">MBA</option>
-                <option value="M.Tech">M.Tech</option>
+                <option value="" disabled <%= !locals.credentialData ? 'selected' : '' %>>Select degree...</option>
+                <% degrees.forEach(function(deg) { %>
+                  <option value="<%= deg %>" <%= locals.credentialData && credentialData.degree === deg ? 'selected' : '' %>><%= deg %></option>
+                <% }); %>
               </select>
             </div>
           </div>
@@ -108,38 +113,33 @@
           <div class="form-row">
             <div class="input-group">
               <label>Graduation Year</label>
-              <input type="number" name="gradYear" placeholder="Enter graduation year..." required>
+              <input type="number" name="gradYear" placeholder="Enter graduation year..." required
+                     value="<%= locals.credentialData ? credentialData.gradYear : '' %>">
             </div>
             <div class="input-group">
               <label>Branch</label>
+              <% 
+                const branches = [
+                  "Biomedical Engineering (B.Tech. - 4yrs)", "Biotechnology (B.Tech. - 4yrs)", "Civil Engineering (B.Tech. - 4yrs)",
+                  "Chemical Engineering (B.Tech. - 4yrs)", "Chemical Engineering (B.Tech. M.Tech Dual Degree - 5yrs)",
+                  "Ceramic Engineering (B.Tech. - 4yrs)", "Industrial Ceramic (B.Tech. M.Tech Dual Degree - 5yrs)",
+                  "Artificial Intelligence (B.Tech. - 4yrs)", "Computer Science and Engineering (B.Tech. - 4yrs)",
+                  "Chemistry (Integrated M.Sc. - 5yrs)", "Electronics and Communication Engineering (B.Tech. - 4yrs)",
+                  "Electronics and Instrumentation Engineering (B.Tech. - 4yrs)", "Electrical Engineering (B.Tech. - 4yrs)",
+                  "Food Process Engineering (B.Tech. - 4yrs)", "Industrial Design (B.Tech. - 4yrs)",
+                  "Life Science (Integrated M.Sc. - 5yrs)", "Mathematics and Computing (B.Tech. - 4yrs)",
+                  "Mathematics (Integrated M.Sc. - 5yrs)", "Mechanical Engineering (B.Tech. - 4yrs)",
+                  "Metallurgical and Materials Engineering (B.Tech. - 4yrs)",
+                  "Metallurgical and Materials Engineering (B.Tech. M.Tech Dual Degree - 5yrs)",
+                  "Mining Engineering (B.Tech. - 4yrs)", "Mining Engineering (B.Tech. M.Tech Dual Degree - 5yrs)",
+                  "Architecture (B.Arch. - 5yrs)", "Engineering Physics (B.Tech. - 4yrs)", "Physics (Integrated M.Sc. - 5yrs)"
+                ];
+              %>
               <select name="branch" required>
-                <option value="" disabled selected>Select branch...</option>
-                <option value="Biomedical Engineering (B.Tech. - 4yrs)">Biomedical Engineering (B.Tech. - 4yrs)</option>
-                <option value="Biotechnology (B.Tech. - 4yrs)">Biotechnology (B.Tech. - 4yrs)</option>
-                <option value="Civil Engineering (B.Tech. - 4yrs)">Civil Engineering (B.Tech. - 4yrs)</option>
-                <option value="Chemical Engineering (B.Tech. - 4yrs)">Chemical Engineering (B.Tech. - 4yrs)</option>
-                <option value="Chemical Engineering (B.Tech. M.Tech Dual Degree - 5yrs)">Chemical Engineering (B.Tech. M.Tech Dual Degree - 5yrs)</option>
-                <option value="Ceramic Engineering (B.Tech. - 4yrs)">Ceramic Engineering (B.Tech. - 4yrs)</option>
-                <option value="Industrial Ceramic (B.Tech. M.Tech Dual Degree - 5yrs)">Industrial Ceramic (B.Tech. M.Tech Dual Degree - 5yrs)</option>
-                <option value="Artificial Intelligence (B.Tech. - 4yrs)">Artificial Intelligence (B.Tech. - 4yrs)</option>
-                <option value="Computer Science and Engineering (B.Tech. - 4yrs)">Computer Science and Engineering (B.Tech. - 4yrs)</option>
-                <option value="Chemistry (Integrated M.Sc. - 5yrs)">Chemistry (Integrated M.Sc. - 5yrs)</option>
-                <option value="Electronics and Communication Engineering (B.Tech. - 4yrs)">Electronics and Communication Engineering (B.Tech. - 4yrs)</option>
-                <option value="Electronics and Instrumentation Engineering (B.Tech. - 4yrs)">Electronics and Instrumentation Engineering (B.Tech. - 4yrs)</option>
-                <option value="Electrical Engineering (B.Tech. - 4yrs)">Electrical Engineering (B.Tech. - 4yrs)</option>
-                <option value="Food Process Engineering (B.Tech. - 4yrs)">Food Process Engineering (B.Tech. - 4yrs)</option>
-                <option value="Industrial Design (B.Tech. - 4yrs)">Industrial Design (B.Tech. - 4yrs)</option>
-                <option value="Life Science (Integrated M.Sc. - 5yrs)">Life Science (Integrated M.Sc. - 5yrs)</option>
-                <option value="Mathematics and Computing (B.Tech. - 4yrs)">Mathematics and Computing (B.Tech. - 4yrs)</option>
-                <option value="Mathematics (Integrated M.Sc. - 5yrs)">Mathematics (Integrated M.Sc. - 5yrs)</option>
-                <option value="Mechanical Engineering (B.Tech. - 4yrs)">Mechanical Engineering (B.Tech. - 4yrs)</option>
-                <option value="Metallurgical and Materials Engineering (B.Tech. - 4yrs)">Metallurgical and Materials Engineering (B.Tech. - 4yrs)</option>
-                <option value="Metallurgical and Materials Engineering (B.Tech. M.Tech Dual Degree - 5yrs)">Metallurgical and Materials Engineering (B.Tech. M.Tech Dual Degree - 5yrs)</option>
-                <option value="Mining Engineering (B.Tech. - 4yrs)">Mining Engineering (B.Tech. - 4yrs)</option>
-                <option value="Mining Engineering (B.Tech. M.Tech Dual Degree - 5yrs)">Mining Engineering (B.Tech. M.Tech Dual Degree - 5yrs)</option>
-                <option value="Architecture (B.Arch. - 5yrs)">Architecture (B.Arch. - 5yrs)</option>
-                <option value="Engineering Physics (B.Tech. - 4yrs)">Engineering Physics (B.Tech. - 4yrs)</option>
-                <option value="Physics (Integrated M.Sc. - 5yrs)">Physics (Integrated M.Sc. - 5yrs)</option>
+                <option value="" disabled <%= !locals.credentialData ? 'selected' : '' %>>Select branch...</option>
+                <% branches.forEach(function(b) { %>
+                  <option value="<%= b %>" <%= locals.credentialData && credentialData.branch === b ? 'selected' : '' %>><%= b %></option>
+                <% }); %>
               </select>
             </div>
           </div>
@@ -192,10 +192,10 @@
                 <p class="text-muted mb-0">Fill out the form to generate the credential and QR code.</p>
               </div>
             <% } %>
-          </div> <!-- Correctly closes the success-state-box -->
-        <% } %> <!-- Correctly closes the main else statement -->
+          </div> 
+        <% } %> 
             
-      </div> <!-- Correctly closes the right column card -->
+      </div> 
   </main>
 
 </body>
