@@ -49,31 +49,7 @@ function requireRole(role) {
 }
 
 // ==========================================
-// 2. ORIGINAL IN-MEMORY DEMO DATA
-// ==========================================
-let revokedList = [
-  {
-    id: "CERT-REV991",
-    studentName: "Aman Verma",
-    rollNo: "2019CS0231",
-    degree: "B.Tech",
-    branch: "Civil Engineering",
-    revokedDate: "2025-10-14",
-    reason: "Administrative Discrepancy",
-  },
-  {
-    id: "CERT-REV404",
-    studentName: "Priya Sharma",
-    rollNo: "2020EE0114",
-    degree: "B.Tech",
-    branch: "Electrical Engineering",
-    revokedDate: "2026-01-02",
-    reason: "Duplicate Issuance",
-  },
-];
-
-// ==========================================
-// 3. PUBLIC & LANDING ROUTES
+// 2. PUBLIC & LANDING ROUTES
 // ==========================================
 app.get("/", (req, res) => {
   res.render("index");
@@ -102,7 +78,7 @@ app.get("/test-hash", function (req, res) {
 });
 
 // ==========================================
-// 4. SECURE ADMINISTRATION LOGIN
+// 3. SECURE ADMINISTRATION LOGIN
 // ==========================================
 app.get("/administration_login", (req, res) => {
   const showError = req.query.error === "true";
@@ -148,7 +124,7 @@ app.post("/administration_login", async (req, res) => {
 });
 
 // ==========================================
-// 5. PROTECTED ADMIN DASHBOARD ROUTES
+// 4. PROTECTED ADMIN DASHBOARD ROUTES
 // ==========================================
 app.get("/dashboard", requireRole("admin"), (req, res) => {
   res.render("overview", { activePage: "overview" });
@@ -174,6 +150,7 @@ app.post(
 
     try {
       // 1. INJECT the certificate permanently into your Postgres table
+      // Note: 'status' defaults to 'valid' via our Postgres schema update
       await pool.query(
         `INSERT INTO certificates (cert_id, student_name, roll_no, degree, branch, grad_year, document_hash) 
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
@@ -189,7 +166,6 @@ app.post(
       );
 
       // 2. Generate Real QR Code linking to the scanner
-      // NOTE: Update this URL to your real Railway URL!
       const verificationUrl = `https://eduverse-portal.up.railway.app/dashboard/verify?id=${certificateID}`;
       const qrCodeImage = await QRCode.toDataURL(verificationUrl);
 
@@ -199,10 +175,10 @@ app.post(
         credentialData: {
           id: certificateID,
           studentName: studentName,
-          rollNo: rollNo, // <-- Added this
-          degree: degree, // <-- Added this
-          branch: branch, // <-- Added this
-          gradYear: gradYear, // <-- Added this
+          rollNo: rollNo,
+          degree: degree,
+          branch: branch,
+          gradYear: gradYear,
           hash: documentHash,
           qrCode: qrCodeImage,
         },
@@ -215,21 +191,18 @@ app.post(
 );
 
 // ==========================================
-// PUBLIC VERIFICATION PORTAL (Unlocked!)
+// 5. PUBLIC VERIFICATION PORTAL
 // ==========================================
 
-// 1. GET Route: Loads the public page when QR is scanned (Notice requireRole is GONE)
 app.get("/dashboard/verify", (req, res) => {
-  const prefillId = req.query.id || null; // Catches the ID from the QR code scan
+  const prefillId = req.query.id || null;
   res.render("verify", { verifiedData: null, prefillId: prefillId });
 });
 
-// 2. POST Route: Handles the "Look up" button & Auto-submit
 app.post("/verify-action", async (req, res) => {
   const selectedCertId = req.body.certId;
 
   try {
-    // 1. Search the live database
     const result = await pool.query(
       "SELECT * FROM certificates WHERE cert_id = $1",
       [selectedCertId],
@@ -238,23 +211,19 @@ app.post("/verify-action", async (req, res) => {
     if (result.rows.length === 0) {
       return res.render("verify", {
         verifiedData: { notFound: true, id: selectedCertId },
-        prefillId: selectedCertId, // Keeps their typed ID in the box
+        prefillId: selectedCertId,
       });
     }
 
     const cert = result.rows[0];
-
-    // 2. Recompute the hash right now
     const rawData = `${cert.student_name}|${cert.roll_no}|${cert.degree}|${cert.branch}|${cert.grad_year}`;
     const recomputedHash = crypto
       .createHash("sha256")
       .update(rawData)
       .digest("hex");
 
-    // 3. Compare real database hash vs newly computed hash
     const isMatch = recomputedHash === cert.document_hash;
 
-    // 4. Send the result to the right side of the screen
     res.render("verify", {
       verifiedData: {
         notFound: false,
@@ -266,7 +235,9 @@ app.post("/verify-action", async (req, res) => {
         gradYear: cert.grad_year,
         originalHash: cert.document_hash,
         recomputedHash: recomputedHash,
-        isMatch: isMatch, // True = Verified Green, False = Tampered Red
+        isMatch: isMatch,
+        isRevoked: cert.status === "revoked", // THE NEW KILL SWITCH CHECK
+        revocationReason: cert.revocation_reason,
       },
       prefillId: selectedCertId,
     });
@@ -277,49 +248,48 @@ app.post("/verify-action", async (req, res) => {
 });
 
 // ==========================================
-// END PUBLIC VERIFICATION ROUTES
+// 6. ADMIN REVOCATION REGISTRY (REAL DB)
 // ==========================================
 
-app.get("/dashboard/revoke", requireRole("admin"), (req, res) => {
-  res.render("revoke", { activePage: "revoke", revokedList: revokedList });
-});
-
-app.post("/revoke-action", requireRole("admin"), (req, res) => {
-  const { certId, reason } = req.body;
-  const existingIndex = revokedList.findIndex((item) => item.id === certId);
-
-  if (existingIndex === -1) {
-    let studentName = "Rahul Kumar";
-    let rollNo = "2021CS0456";
-
-    if (certId === "CERT-L55EFV") {
-      studentName = "Jane Doe";
-      rollNo = "2020CS0112";
-    }
-
-    revokedList.unshift({
-      id: certId || "CERT-KQ26MQ",
-      studentName: studentName,
-      rollNo: rollNo,
-      degree: "B.Tech",
-      branch: "Chemical Engineering",
-      revokedDate: new Date().toISOString().split("T")[0],
-      reason: reason || "Academic misconduct discovered",
-    });
+app.get("/dashboard/revoke", requireRole("admin"), async (req, res) => {
+  try {
+    // Fetch only documents where the status is 'revoked'
+    const result = await pool.query(
+      "SELECT * FROM certificates WHERE status = 'revoked' ORDER BY revoked_date DESC",
+    );
+    res.render("revoke", { activePage: "revoke", revokedList: result.rows });
+  } catch (err) {
+    console.error("Error loading registry:", err);
+    res.status(500).send("Error loading registry.");
   }
-  res.redirect("/dashboard/revoke");
 });
 
-// 1. Serve the Create Account page
+app.post("/revoke-action", requireRole("admin"), async (req, res) => {
+  const { certId, reason } = req.body;
+  try {
+    // Permanently flip the switch in the database
+    await pool.query(
+      "UPDATE certificates SET status = 'revoked', revocation_reason = $1, revoked_date = CURRENT_DATE WHERE cert_id = $2",
+      [reason || "Academic misconduct discovered", certId],
+    );
+    res.redirect("/dashboard/revoke");
+  } catch (err) {
+    console.error("Error revoking certificate:", err);
+    res.status(500).send("Error revoking certificate.");
+  }
+});
+
+// ==========================================
+// 7. REGISTRATION & STUDENT PORTAL
+// ==========================================
+
 app.get("/register", (req, res) => {
   res.render("register");
 });
 
-// 2. Handle the Registration Form Submission
 app.post("/register", async (req, res) => {
   const { fullName, rollNumber, password, confirmPassword } = req.body;
 
-  // Security check: Make sure passwords match before hitting the database
   if (password !== confirmPassword) {
     return res
       .status(400)
@@ -327,21 +297,18 @@ app.post("/register", async (req, res) => {
   }
 
   try {
-    // Check if the Roll Number already exists in the database
     const checkUser = await pool.query(
       "SELECT * FROM users WHERE login_id = $1",
       [rollNumber],
     );
 
     if (checkUser.rows.length > 0) {
-      // User exists! Change nothing and send an error back.
       return res.status(400).json({
         success: false,
         message: "This Roll Number is already registered!",
       });
     }
 
-    // User is new! Encrypt the password and save them.
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -353,7 +320,6 @@ app.post("/register", async (req, res) => {
       [rollNumber, hashedPassword, "student", fullName],
     );
 
-    // Send a success signal back to the frontend
     res.status(200).json({ success: true, redirectUrl: "/login" });
   } catch (err) {
     console.error("Registration error:", err);
@@ -363,9 +329,6 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// ==========================================
-// 6. SECURE STUDENT LOGIN & PORTAL
-// ==========================================
 app.get("/login", (req, res) => {
   res.render("login", { activePage: "login", error: null });
 });
@@ -409,7 +372,6 @@ app.post("/login", async (req, res) => {
           return res
             .status(500)
             .json({ success: false, message: "Server error." });
-        // Send a JSON success signal and the correct student portal URL
         res.status(200).json({ success: true, redirectUrl: "/student-portal" });
       });
     });
@@ -419,12 +381,10 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Protected Student Portal (Now fetching REAL data)
 app.get("/student-portal", requireRole("student"), async (req, res) => {
-  const currentRollNo = req.session.user.loginId; // e.g., 125CH0053
+  const currentRollNo = req.session.user.loginId;
 
   try {
-    // 1. Fetch the student's personal info
     const userResult = await pool.query(
       "SELECT full_name FROM users WHERE login_id = $1",
       [currentRollNo],
@@ -432,7 +392,6 @@ app.get("/student-portal", requireRole("student"), async (req, res) => {
     const fullName =
       userResult.rows.length > 0 ? userResult.rows[0].full_name : currentRollNo;
 
-    // 2. Fetch all real certificates belonging strictly to this roll number
     const certResult = await pool.query(
       "SELECT * FROM certificates WHERE roll_no = $1 ORDER BY issue_date DESC",
       [currentRollNo],
@@ -445,10 +404,9 @@ app.get("/student-portal", requireRole("student"), async (req, res) => {
       gradYear: "2029",
     };
 
-    // 3. Send the real database arrays to the frontend EJS file
     res.render("student-portal", {
       student: studentData,
-      certificates: certResult.rows, // Passes the real docs to the screen!
+      certificates: certResult.rows,
     });
   } catch (err) {
     console.error("Database error loading portal:", err);
@@ -456,13 +414,11 @@ app.get("/student-portal", requireRole("student"), async (req, res) => {
   }
 });
 
-// The Dynamic PDF Generator Route
 app.get("/download/:cert_id", requireRole("student"), async (req, res) => {
   const certId = req.params.cert_id;
   const currentRollNo = req.session.user.loginId;
 
   try {
-    // 1. Security Check: Ensure this certificate belongs to the logged-in student
     const certQuery = await pool.query(
       "SELECT * FROM certificates WHERE cert_id = $1 AND roll_no = $2",
       [certId, currentRollNo],
@@ -474,10 +430,8 @@ app.get("/download/:cert_id", requireRole("student"), async (req, res) => {
 
     const cert = certQuery.rows[0];
 
-    // 2. Fire up the PDF Engine
     const doc = new PDFDocument({ layout: "landscape", size: "A4" });
 
-    // Tell the browser to download it instead of just displaying code
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
@@ -485,8 +439,7 @@ app.get("/download/:cert_id", requireRole("student"), async (req, res) => {
     );
     doc.pipe(res);
 
-    // 3. Draw the Certificate Design
-    doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).stroke(); // Outer border
+    doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).stroke();
     doc.moveDown(2);
     doc
       .fontSize(35)
@@ -507,14 +460,13 @@ app.get("/download/:cert_id", requireRole("student"), async (req, res) => {
       .text(`${cert.degree} in ${cert.branch}`, { align: "center" });
     doc.moveDown(3);
 
-    // Add the tamper-proof cryptographic hashes at the bottom
     doc
       .fontSize(10)
       .fillColor("gray")
       .text(`Document Hash: ${cert.document_hash}`, { align: "center" });
     doc.text(`Digital Verification ID: ${cert.cert_id}`, { align: "center" });
 
-    doc.end(); // Finish building and send to student
+    doc.end();
   } catch (err) {
     console.error("PDF generation error:", err);
     res.status(500).send("Error generating document.");
@@ -522,7 +474,7 @@ app.get("/download/:cert_id", requireRole("student"), async (req, res) => {
 });
 
 // ==========================================
-// 7. SECURE LOGOUT ROUTE
+// 8. LOGOUT & SERVER START
 // ==========================================
 app.get("/logout", (req, res) => {
   req.session.destroy(() => {
@@ -530,9 +482,6 @@ app.get("/logout", (req, res) => {
   });
 });
 
-// ==========================================
-// 8. START SERVER
-// ==========================================
 app.listen(port, () => {
   console.log(`EduVerse Secure Server is awake and listening on port ${port}`);
 });

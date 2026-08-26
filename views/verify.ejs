@@ -33,7 +33,7 @@
       <p>Cryptographically verify academic credentials against the immutable database.</p>
     </div>
 
-    <!-- 2-Column Grid Wrapper matching the Issue Page -->
+    <!-- 2-Column Grid Wrapper -->
     <div class="verify-grid">
 
       <!-- LEFT COLUMN: Search Card -->
@@ -74,50 +74,67 @@
               </p>
             </div>
 
-            <!-- STATE 3: Success or Tampered -->
+            <!-- STATE 3: Real Database Match -->
             <% } else { %>
               <div class="success-state-box">
 
-                <% if (verifiedData.isMatch) { %>
-                  <div class="status-badge success">✅ Verified & Authentic</div>
-                  <% } else { %>
-                    <div class="status-badge error">❌ Tamper Alert: Invalid Credential</div>
-                    <% } %>
+                <!-- THE KILL SWITCH: Check if Revoked FIRST -->
+                <% if (verifiedData.isRevoked) { %>
+                  <div class="status-badge error"
+                    style="background-color: #fef2f2; color: #991b1b; border: 2px solid #ef4444; padding: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">⚠️ CREDENTIAL REVOKED</div>
+                    <div style="font-size: 0.85rem; font-weight: normal;">This document was permanently invalidated by
+                      the institution.</div>
+                  </div>
+                  <div
+                    style="background-color: #fee2e2; padding: 10px; border-radius: 6px; margin-bottom: 1.5rem; font-size: 0.9rem; color: #991b1b;">
+                    <strong>Reason:</strong>
+                    <%= verifiedData.revocationReason %>
+                  </div>
 
-                      <div class="data-row"><strong>Name:</strong>
-                        <%= verifiedData.studentName %>
-                      </div>
-                      <div class="data-row"><strong>Cert ID:</strong>
-                        <%= verifiedData.id %>
-                      </div>
-                      <div class="data-row"><strong>Degree:</strong>
-                        <%= verifiedData.degree %>
-                      </div>
-                      <div class="data-row">
-                        <strong>Branch:</strong>
-                        <span
-                          style="color: <%= verifiedData.isMatch ? 'inherit' : '#dc2626' %>; font-weight: <%= verifiedData.isMatch ? 'normal' : '600' %>;">
-                          <%= verifiedData.branch %>
-                        </span>
-                      </div>
-                      <div class="data-row"><strong>Grad Year:</strong>
-                        <%= verifiedData.gradYear %>
-                      </div>
+                  <!-- If not revoked, check for Tampering -->
+                  <% } else if (verifiedData.isMatch) { %>
+                    <div class="status-badge success">✅ Verified & Authentic</div>
+                    <% } else { %>
+                      <div class="status-badge error">❌ Tamper Alert: Invalid Credential</div>
+                      <% } %>
 
-                      <div class="hash-display mt-4">
-                        <div class="hash-label">Original Database Hash:</div>
-                        <div class="hash-string">
-                          <%= verifiedData.originalHash %>
+                        <!-- Document Data Audit Trail -->
+                        <div class="data-row"><strong>Name:</strong>
+                          <%= verifiedData.studentName %>
                         </div>
-                      </div>
-
-                      <div class="hash-display"
-                        style="background-color: <%= verifiedData.isMatch ? '#f8fafc' : '#fef2f2' %>; border-color: <%= verifiedData.isMatch ? '#e2e8f0' : '#fca5a5' %>;">
-                        <div class="hash-label">Calculated Verification Hash:</div>
-                        <div class="hash-string" style="color: <%= verifiedData.isMatch ? '#0f172a' : '#dc2626' %>;">
-                          <%= verifiedData.recomputedHash %>
+                        <div class="data-row"><strong>Cert ID:</strong>
+                          <%= verifiedData.id %>
                         </div>
-                      </div>
+                        <div class="data-row"><strong>Degree:</strong>
+                          <%= verifiedData.degree %>
+                        </div>
+                        <div class="data-row">
+                          <strong>Branch:</strong>
+                          <span
+                            style="color: <%= (!verifiedData.isRevoked && !verifiedData.isMatch) ? '#dc2626' : 'inherit' %>; font-weight: <%= (!verifiedData.isRevoked && !verifiedData.isMatch) ? '600' : 'normal' %>;">
+                            <%= verifiedData.branch %>
+                          </span>
+                        </div>
+                        <div class="data-row"><strong>Grad Year:</strong>
+                          <%= verifiedData.gradYear %>
+                        </div>
+
+                        <div class="hash-display mt-4">
+                          <div class="hash-label">Original Database Hash:</div>
+                          <div class="hash-string">
+                            <%= verifiedData.originalHash %>
+                          </div>
+                        </div>
+
+                        <div class="hash-display"
+                          style="background-color: <%= verifiedData.isMatch ? '#f8fafc' : '#fef2f2' %>; border-color: <%= verifiedData.isMatch ? '#e2e8f0' : '#fca5a5' %>;">
+                          <div class="hash-label">Calculated Verification Hash:</div>
+                          <div class="hash-string" style="color: <%= verifiedData.isMatch ? '#0f172a' : '#dc2626' %>;">
+                            <%= verifiedData.recomputedHash %>
+                          </div>
+                        </div>
+
               </div>
               <% } %>
       </div>
