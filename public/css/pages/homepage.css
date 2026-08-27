@@ -554,19 +554,29 @@ h1 {
 
 /* --- Dark CTA Banner --- */
 .cta-banner {
-  background-color: #111a28; /* Deep navy dark theme */
-  max-width: 1100px;
-  margin: 100 auto 80px auto;
-  border-radius: 20px;
-  padding: 60px 70px;
+  /* 1. The Magic Centering Trick */
+  margin: 4rem auto;
+
+  /* 2. Sizing constraints */
+  width: 90%;
+  max-width: 1100px; /* Matches the width of your carousel! */
+
+  /* 3. Make it a clean, floating card */
+  border-radius: 24px;
+  padding: 3rem 4rem;
+
+  /* 4. Keep your internal layout aligned */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 40px;
-  color: white;
+  gap: 2rem;
+
+  /* (Keep whatever background-color you already have here) */
+  background-color: #0f172a;
 }
 
 .cta-banner-content h2 {
+  color: #ffffff;
   font-size: 28px;
   font-weight: 800;
   margin-bottom: 10px;
@@ -708,4 +718,44 @@ h1 {
 
 .footer-bottom-links a:hover {
   color: white;
+}
+
+.terminal-box {
+  width: 100%;
+  height: 100%;
+  background-color: #0f172a; /* Keep your existing dark theme */
+  border-radius: 12px;
+  padding: 1.5rem;
+  font-family: "Courier New", Courier, monospace;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 0.75rem;
+}
+
+.terminal-title {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.terminal-body {
+  color: #22c55e; /* Hacker terminal green */
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* Customizes the blinking cursor */
+.typed-cursor {
+  color: #22c55e;
+  font-size: 1.2rem;
 }

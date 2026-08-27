@@ -27,21 +27,6 @@
         letter-spacing: 1px;
       }
 
-      /* Container for the Three.js cube-burst animation */
-      .sandbox-animation {
-        width: 100%;
-        height: 420px;
-        border-radius: 16px;
-        overflow: hidden;
-        background: #0f172a;
-      }
-
-      .sandbox-animation canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-      }
-
       /* ========================================= */
       /* NEW: EduVerse Screenshot Carousel Styles  */
       /* ========================================= */
@@ -50,29 +35,44 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        background-color: #f8fafc; /* Matches your light background */
+        background-color: #f8fafc;
+        overflow: hidden; /* Prevents horizontal scrollbars from peeking slides */
       }
 
       .carousel-container {
         position: relative;
         width: 100%;
-        max-width: 1100px;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        background: #000;
+        max-width: 1200px;
         margin-top: 1rem;
       }
 
       .carousel-track {
         display: flex;
+        gap: 2%; /* Space between slides */
         transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         width: 100%;
+        align-items: center; /* Centers the scaled slides vertically */
       }
 
       .carousel-slide {
-        min-width: 100%;
+        /* Forces the slide to take up exactly 70% of the container, leaving 30% for the sides */
+        flex: 0 0 70%;
         box-sizing: border-box;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+
+        /* The "Inactive" state by default */
+        opacity: 0.4;
+        transform: scale(0.85);
+        transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+
+      /* The "Active/Center" state */
+      .carousel-slide.active-slide {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
       }
 
       .carousel-slide img {
@@ -80,14 +80,14 @@
         height: auto;
         display: block;
         object-fit: cover;
-        aspect-ratio: 16/9; /* Ensures all screenshots are uniform */
+        aspect-ratio: 16/9;
       }
 
       /* Bottom Right Controls */
       .carousel-controls {
         position: absolute;
         bottom: 24px;
-        right: 24px;
+        right: 20%; /* Adjusted slightly inward to sit on the active slide */
         display: flex;
         gap: 12px;
         z-index: 10;
@@ -113,7 +113,7 @@
       .ctrl-btn:hover {
         transform: scale(1.08);
         background-color: #f1f5f9;
-        color: #21a1f1; /* Light blue accent on hover */
+        color: #21a1f1;
       }
 
       .ctrl-btn:active {
@@ -151,7 +151,7 @@
         <!-- Animated text section -->
         <div class="hero-animation-box">
           <div class="hero-animation-text" id="hero-animation-text">
-            Verified Secure Trusted
+            Verified. Secure. Trusted.
           </div>
         </div>
 
@@ -301,9 +301,19 @@
           </div>
           <!-- Slide 2 -->
           <div class="carousel-slide">
-            <img src="/images/screenshot-issue.png" alt="EduVerse Issuance Page" />
+            <img
+              src="/images/screenshot-issue.png"
+              alt="EduVerse Issuance Page"
+            />
           </div>
           <!-- Slide 3 -->
+          <div class="carousel-slide">
+            <img
+              src="/images/screenshot-verify.png"
+              alt="EduVerse Verification Portal"
+            />
+          </div>
+          <!-- Slide 4 -->
           <div class="carousel-slide">
             <img
               src="/images/screenshot-revoke.png"
@@ -373,6 +383,7 @@
 
     <!-- ABOUT US SECTION -->
     <div class="about-section">
+      <!-- LEFT SIDE: Text and Features -->
       <div class="about-content">
         <h2 class="about-title">About Us</h2>
         <p class="about-description">
@@ -416,9 +427,18 @@
         </div>
       </div>
 
-      <!-- Right Side: Animated Three.js cube burst -->
+      <!-- RIGHT SIDE: Hacker Terminal Effect -->
       <div class="about-image">
-        <div id="about-animation-container" class="sandbox-animation"></div>
+        <div class="terminal-box">
+          <div class="terminal-header">
+            <span class="dot red"></span><span class="dot yellow"></span
+            ><span class="dot green"></span>
+            <span class="terminal-title">bash - node verify.js</span>
+          </div>
+          <div class="terminal-body">
+            <span id="typed-output"></span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -617,38 +637,96 @@
       });
     </script>
 
-    <!-- 2. Carousel Auto-Slide & Controls Script -->
+    <!-- 2. Infinite Loop Carousel Script (The Clone Hack) -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const track = document.getElementById("track");
+
+        let originalSlides = Array.from(
+          document.querySelectorAll(".carousel-slide"),
+        );
+
+        const firstClone = originalSlides[0].cloneNode(true);
+        const lastClone =
+          originalSlides[originalSlides.length - 1].cloneNode(true);
+
+        track.appendChild(firstClone);
+        track.insertBefore(lastClone, originalSlides[0]);
+
         const slides = Array.from(document.querySelectorAll(".carousel-slide"));
+
         const prevBtn = document.getElementById("prevBtn");
         const nextBtn = document.getElementById("nextBtn");
         const playPauseBtn = document.getElementById("playPauseBtn");
         const playIcon = document.getElementById("playIcon");
         const pauseIcon = document.getElementById("pauseIcon");
 
-        let currentIndex = 0;
+        let currentIndex = 1;
         let isPlaying = true;
         let autoSlideInterval;
-        const slideDuration = 4000; // 4 seconds per slide
+        let isTransitioning = false;
+        const slideDuration = 3000;
 
-        // Move track
-        const updateSlidePosition = () => {
-          track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        const slideWidthPercent = 70;
+        const gapPercent = 2;
+        const centerOffset = (100 - slideWidthPercent) / 2; // 15%
+        const shiftAmount = slideWidthPercent + gapPercent; // 72%
+
+        const updateSlidePosition = (animate = true) => {
+          if (!animate) {
+            track.style.transition = "none";
+            slides.forEach((s) => (s.style.transition = "none"));
+          } else {
+            track.style.transition =
+              "transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)";
+            slides.forEach(
+              (s) =>
+                (s.style.transition = "all 0.6s cubic-bezier(0.25, 1, 0.5, 1)"),
+            );
+          }
+
+          const translateValue = centerOffset - currentIndex * shiftAmount;
+          track.style.transform = `translateX(${translateValue}%)`;
+
+          slides.forEach((slide, index) => {
+            if (index === currentIndex) {
+              slide.classList.add("active-slide");
+            } else {
+              slide.classList.remove("active-slide");
+            }
+          });
+
+          if (!animate) track.offsetHeight;
         };
 
         const moveToNextSlide = () => {
-          currentIndex = (currentIndex + 1) % slides.length;
-          updateSlidePosition();
+          if (isTransitioning) return;
+          isTransitioning = true;
+          currentIndex++;
+          updateSlidePosition(true);
         };
 
         const moveToPrevSlide = () => {
-          currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-          updateSlidePosition();
+          if (isTransitioning) return;
+          isTransitioning = true;
+          currentIndex--;
+          updateSlidePosition(true);
         };
 
-        // Auto-play control
+        track.addEventListener("transitionend", () => {
+          isTransitioning = false;
+
+          if (currentIndex === slides.length - 1) {
+            currentIndex = 1;
+            updateSlidePosition(false);
+          }
+
+          if (currentIndex === 0) {
+            currentIndex = slides.length - 2;
+            updateSlidePosition(false);
+          }
+        });
+
         const startAutoPlay = () => {
           if (!autoSlideInterval) {
             autoSlideInterval = setInterval(moveToNextSlide, slideDuration);
@@ -660,7 +738,6 @@
           autoSlideInterval = null;
         };
 
-        // Button Listeners
         nextBtn.addEventListener("click", () => {
           moveToNextSlide();
           if (isPlaying) {
@@ -690,87 +767,39 @@
           isPlaying = !isPlaying;
         });
 
-        // Initialize
+        updateSlidePosition(false);
         startAutoPlay();
       });
     </script>
 
-    <!-- 3. Three.js Cube-burst Animation -->
-    <script type="module">
-      import * as THREE from "https://esm.sh/three@0.166.0";
-      import { animate, stagger } from "https://esm.sh/animejs@4.5.0";
-      import { getInstances } from "https://esm.sh/animejs@4.5.0/adapters/three";
-
-      const container = document.getElementById("about-animation-container");
-
-      if (container) {
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-          50,
-          width / height,
-          0.1,
-          1000,
-        );
-        camera.position.z = 30;
-
-        const renderer = new THREE.WebGLRenderer({
-          antialias: true,
-          alpha: true,
+    <!-- 3. Typed.js Script for the Hacker Terminal -->
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        var typed = new Typed("#typed-output", {
+          strings: [
+            `> Initializing EduVerse Cryptographic Engine...<br>
+         > Establishing secure node connection... [OK]<br>
+         > Waiting for QR scan...`,
+            `> QR Scan detected.<br>
+         > Extracting Certificate ID...<br>
+         > Fetching block data for ID: 125CH0053<br>
+         > Analyzing parameters...`,
+            `> Name: Utkarsh Tripathi<br>
+         > Institution: NIT Rourkela<br>
+         > Computing SHA-256 Hash...<br>
+         > Hash matched.<br>
+         > Status: <span style="color: #fff; background: #22c55e; padding: 2px 6px; border-radius: 4px;">AUTHENTIC VERIFIED</span>`,
+          ],
+          typeSpeed: 30,
+          backSpeed: 0,
+          startDelay: 500,
+          backDelay: 1000,
+          loop: true,
+          showCursor: true,
+          smartBackspace: false,
         });
-        renderer.setSize(width, height);
-        container.appendChild(renderer.domElement);
-
-        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambient);
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(5, 5, 5);
-        scene.add(light);
-
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshStandardMaterial({ color: 0x21a1f1 });
-
-        const count = 120;
-        const instancedMesh = new THREE.InstancedMesh(
-          geometry,
-          material,
-          count,
-        );
-        scene.add(instancedMesh);
-
-        const dummy = new THREE.Object3D();
-        for (let i = 0; i < count; i++) {
-          dummy.position.set(
-            (Math.random() - 0.5) * 45,
-            (Math.random() - 0.5) * 45,
-            (Math.random() - 0.5) * 45,
-          );
-          dummy.scale.setScalar(0.3);
-          dummy.updateMatrix();
-          instancedMesh.setMatrixAt(i, dummy.matrix);
-        }
-        instancedMesh.instanceMatrix.needsUpdate = true;
-
-        function renderLoop() {
-          requestAnimationFrame(renderLoop);
-          instancedMesh.instanceMatrix.needsUpdate = true;
-          renderer.render(scene, camera);
-        }
-        renderLoop();
-
-        const instances = getInstances(instancedMesh);
-        animate(instances, {
-          x: 0,
-          y: 0,
-          z: 0,
-          scale: 1,
-          delay: stagger(15),
-          duration: 1400,
-          easing: "easeOutExpo",
-        });
-      }
+      });
     </script>
   </body>
 </html>
