@@ -7,12 +7,14 @@
 }
 
 body {
-  background-color: #f8fafc;
+  /* The glowing radial gradient background */
+  background: radial-gradient(circle at center, #a8cbfb 0%, #ffffff 85%);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  margin: 0;
 }
 
 .card {

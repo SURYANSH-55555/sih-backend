@@ -1,305 +1,429 @@
 <!doctype html>
 <html>
+  <head>
+    <title>Abhedya</title>
+    <!-- Links to public/css/pages/overview.css -->
+    <link rel="stylesheet" href="/css/pages/homepage.css" />
+    <!-- Anime.js library (v3 UMD build, works with a plain script tag) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+      /* Styles for the new animated text section */
+      .hero-animation-box {
+        min-height: 90px;
+        display: flex;
+        align-items: center;
+        margin: 24px 0;
+      }
 
-<head>
-  <title>EduVerse</title>
-  <!-- Links to public/css/pages/overview.css -->
-  <link rel="stylesheet" href="/css/pages/homepage.css" />
-  <!-- Anime.js library (v3 UMD build, works with a plain script tag) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-  <style>
-    /* Styles for the new animated text section */
-    .hero-animation-box {
-      min-height: 90px;
-      display: flex;
-      align-items: center;
-      margin: 24px 0;
-    }
+      .hero-animation-box .letter {
+        display: inline-block;
+        opacity: 0;
+      }
 
-    .hero-animation-box .letter {
-      display: inline-block;
-      opacity: 0;
-    }
+      .hero-animation-text {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #21a1f1;
+        letter-spacing: 1px;
+      }
 
-    .hero-animation-text {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #21a1f1;
-      letter-spacing: 1px;
-    }
+      /* Container for the Three.js cube-burst animation */
+      .sandbox-animation {
+        width: 100%;
+        height: 420px;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #0f172a;
+      }
 
-    /* Container for the Three.js cube-burst animation */
-    .sandbox-animation {
-      width: 100%;
-      height: 420px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #0f172a;
-    }
+      .sandbox-animation canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+      }
 
-    .sandbox-animation canvas {
-      display: block;
-      width: 100% !important;
-      height: 100% !important;
-    }
-  </style>
-</head>
+      /* ========================================= */
+      /* NEW: EduVerse Screenshot Carousel Styles  */
+      /* ========================================= */
+      .carousel-section {
+        padding: 4rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f8fafc; /* Matches your light background */
+      }
 
-<body>
-  <nav class="navbar">
-    <div class="logo">🎓 EduVerse</div>
-    <div class="nav-links">
-      <a href="/administration_login" class="register-link">Administration Login</a>
-      <a href="/login" class="login-btn">Login</a>
-    </div>
-  </nav>
-  <!-- MAIN HERO SECTION -->
-  <div class="hero">
-    <!-- LEFT SIDE: Text and Buttons -->
-    <div class="hero-left">
-      <!-- 1. The Big Title -->
-      <h1>
-        Verify documentation.<br />
-        <span class="highlight">Spot fakes</span> seamlessly.
-      </h1>
+      .carousel-container {
+        position: relative;
+        width: 100%;
+        max-width: 1100px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        background: #000;
+        margin-top: 1rem;
+      }
 
-      <!-- 2. The Subtitle -->
-      <p class="subtitle">
-        Access thousands of certificates - academics and co-curricular
-      </p>
+      .carousel-track {
+        display: flex;
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        width: 100%;
+      }
 
-      <!-- Animated text section (replaces the old Generate Hash button) -->
-      <div class="hero-animation-box">
-        <div class="hero-animation-text" id="hero-animation-text">
-          Verified Secure Trusted
-        </div>
+      .carousel-slide {
+        min-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .carousel-slide img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+        aspect-ratio: 16/9; /* Ensures all screenshots are uniform */
+      }
+
+      /* Bottom Right Controls */
+      .carousel-controls {
+        position: absolute;
+        bottom: 24px;
+        right: 24px;
+        display: flex;
+        gap: 12px;
+        z-index: 10;
+      }
+
+      .ctrl-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0f172a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition:
+          transform 0.2s,
+          background-color 0.2s;
+      }
+
+      .ctrl-btn:hover {
+        transform: scale(1.08);
+        background-color: #f1f5f9;
+        color: #21a1f1; /* Light blue accent on hover */
+      }
+
+      .ctrl-btn:active {
+        transform: scale(0.95);
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="logo">🎓 Abhedya</div>
+      <div class="nav-links">
+        <a href="/administration_login" class="register-link"
+          >Administration Login</a
+        >
+        <a href="/login" class="login-btn">Login</a>
       </div>
+    </nav>
 
-      <!-- 4. The Checkmarks -->
-      <div class="features">
-        <div class="feature-item">
-          <span class="checkmark">✔</span> 2,500+ Certified Colleges
-        </div>
-        <div class="feature-item">
-          <span class="checkmark">✔</span> Verification made basic
-        </div>
-        <div class="feature-item">
-          <span class="checkmark">✔</span> Secure and Accurate
-        </div>
-      </div>
-    </div>
-    <!-- RIGHT SIDE: Dashboard Mockup -->
-    <div class="hero-right">
-      <!-- 1. The outer dashed box -->
-      <div class="mockup-container">
-        <!-- 2. The fake browser top bar -->
-        <div class="browser-header">
-          <div class="dots">
-            <div class="dot red"></div>
-            <div class="dot yellow"></div>
-            <div class="dot green"></div>
+    <!-- MAIN HERO SECTION -->
+    <div class="hero">
+      <!-- LEFT SIDE: Text and Buttons -->
+      <div class="hero-left">
+        <!-- 1. The Big Title -->
+        <h1>
+          Verify documentation.<br />
+          <span class="highlight">Spot fakes</span> seamlessly.
+        </h1>
+
+        <!-- 2. The Subtitle -->
+        <p class="subtitle">
+          Access thousands of certificates - academics and co-curricular
+        </p>
+
+        <!-- Animated text section -->
+        <div class="hero-animation-box">
+          <div class="hero-animation-text" id="hero-animation-text">
+            Verified Secure Trusted
           </div>
-          <div class="url-bar">eduverse.io/dashboard</div>
         </div>
 
-        <!-- 3. The dark image placeholder -->
-        <div class="dashboard-img">[ Dashboard Image Goes Here ]</div>
-
-        <!-- 4. The two white stat cards -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-title">Total Students</div>
-            <div class="stat-value">12323432</div>
+        <!-- 4. The Checkmarks -->
+        <div class="features">
+          <div class="feature-item">
+            <span class="checkmark">✔</span> 2,500+ Certified Colleges
           </div>
-          <div class="stat-card">
-            <div class="stat-title">Colleges</div>
-            <div class="stat-value">14 Paths</div>
+          <div class="feature-item">
+            <span class="checkmark">✔</span> Verification made basic
+          </div>
+          <div class="feature-item">
+            <span class="checkmark">✔</span> Secure and Accurate
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT SIDE: Dashboard Mockup -->
+      <div class="hero-right">
+        <div class="mockup-container">
+          <div class="browser-header">
+            <div class="dots">
+              <div class="dot red"></div>
+              <div class="dot yellow"></div>
+              <div class="dot green"></div>
+            </div>
+            <div class="url-bar">eduverse.io/dashboard</div>
+          </div>
+
+          <div class="dashboard-img">[ Dashboard Image Goes Here ]</div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-title">Total Students</div>
+              <div class="stat-value">57710</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Colleges</div>
+              <div class="stat-value">22</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- LOGOS BANNER SECTION -->
-  <div class="logo-banner">
-    <p class="banner-title">TOP UNIVERSITIES AND COLLEGES</p>
 
-    <div class="logo-track">
-      <!-- We use a simple ⊗ symbol to mimic the logo icons for now -->
-      <div class="logo-item"><span class="logo-icon">⊗</span> IIT Bombay</div>
-      <div class="logo-item"><span class="logo-icon">⊗</span> IIT Delhi</div>
-      <div class="logo-item"><span class="logo-icon">⊗</span> IIT Kanpur</div>
-      <div class="logo-item"><span class="logo-icon">⊗</span> IIT Madras</div>
-      <div class="logo-item"><span class="logo-icon">⊗</span> NIT Trichy</div>
-      <div class="logo-item">
-        <span class="logo-icon">⊗</span> NIT Rourkela
-      </div>
-      <div class="logo-item">
-        <span class="logo-icon">⊗</span> BITS Pilani
+    <!-- LOGOS BANNER SECTION -->
+    <div class="logo-banner">
+      <p class="banner-title">TOP UNIVERSITIES AND COLLEGES</p>
+
+      <div class="logo-track">
+        <div class="logo-item"><span class="logo-icon">⊗</span> IIT Bombay</div>
+        <div class="logo-item"><span class="logo-icon">⊗</span> IIT Delhi</div>
+        <div class="logo-item"><span class="logo-icon">⊗</span> IIT Kanpur</div>
+        <div class="logo-item"><span class="logo-icon">⊗</span> IIT Madras</div>
+        <div class="logo-item"><span class="logo-icon">⊗</span> NIT Trichy</div>
+        <div class="logo-item">
+          <span class="logo-icon">⊗</span> NIT Rourkela
+        </div>
+        <div class="logo-item">
+          <span class="logo-icon">⊗</span> BITS Pilani
+        </div>
       </div>
     </div>
+
     <!-- STATE CARDS SECTION -->
     <div class="states-section">
       <div class="state-card">
         <h2>Bihar</h2>
         <p>56 Colleges<br />1234 Students</p>
       </div>
-
       <div class="state-card">
         <h2>U.P.</h2>
         <p>39 Colleges<br />2138 Students</p>
       </div>
-
       <div class="state-card">
         <h2>Assam</h2>
         <p>21 Colleges<br />1234 Students</p>
       </div>
-
       <div class="state-card">
         <h2>Gujarat</h2>
         <p>92 Colleges<br />12324 Students</p>
       </div>
     </div>
+
     <!-- CATEGORY CARDS SECTION -->
     <div class="categories-section">
-      <!-- Card 1: Academic -->
       <div class="category-card">
-        <!-- Placeholder for the illustration -->
-        <div class="card-img" style="background-color: #2bd49e">
-          [ Image ]
-        </div>
-
+        <div class="card-img" style="background-color: #2bd49e">[ Image ]</div>
         <div class="card-content">
           <span class="badge">ACADEMIC</span>
           <h3>Academic Report Cards and Certificates</h3>
         </div>
-
         <div class="card-footer">
           <span>👥 12,450 Certificates</span>
         </div>
       </div>
 
-      <!-- Card 2: Disciplinary -->
       <div class="category-card">
-        <div class="card-img" style="background-color: #79a5e8">
-          [ Image ]
-        </div>
-
+        <div class="card-img" style="background-color: #79a5e8">[ Image ]</div>
         <div class="card-content">
           <span class="badge">DISCIPLINARY ACTIONS</span>
           <h3>Any Act of Recorded Disciplinary Issues</h3>
         </div>
-
         <div class="card-footer">
           <span>👥 8,920 enrolled</span>
         </div>
       </div>
 
-      <!-- Card 3: Extra-curricular -->
       <div class="category-card">
-        <div class="card-img" style="background-color: #fca7a9">
-          [ Image ]
-        </div>
-
+        <div class="card-img" style="background-color: #fca7a9">[ Image ]</div>
         <div class="card-content">
           <span class="badge">DESIGN</span>
           <h3>Extra-curricular Activities</h3>
         </div>
-
         <div class="card-footer">
           <span>👥 6,200 enrolled</span>
         </div>
       </div>
     </div>
-    <!-- HOW IT WORKS SECTION -->
-    <div class="method-section">
-      <h2 class="method-title">How the EduVerse Method Operates</h2>
 
-      <div class="method-steps">
-        <!-- Step 1 -->
-        <div class="step-card">
-          <div class="step-number">01</div>
-          <h3>Select a Student</h3>
-          <p>
-            Enter in details - name, roll number, graduation year, and any
-            other to select a particular student.
-          </p>
-        </div>
+    <!-- HOW IT WORKS SECTION (CAROUSEL OVERHAUL) -->
+    <section class="carousel-section">
+      <h2
+        class="section-title"
+        style="
+          text-align: center;
+          margin-bottom: 0.5rem;
+          font-size: 2.2rem;
+          color: #0f172a;
+        "
+      >
+        How the EduVerse Method Operates
+      </h2>
+      <p style="text-align: center; color: #64748b; margin-bottom: 2rem">
+        A seamless journey from credential generation to public verification.
+      </p>
 
-        <!-- Step 2 -->
-        <div class="step-card">
-          <div class="step-number">02</div>
-          <h3>Generate QR</h3>
-          <p>
-            Select the student and the criteria you want the information from,
-            automatic generation of QR
-          </p>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="step-card">
-          <div class="step-number">03</div>
-          <h3>Earn Certification</h3>
-          <p>
-            Secure certified proof with cryptographic link verification ready
-            to showcase directly to recruiters and others.
-          </p>
-        </div>
-      </div>
-      <!-- ABOUT US SECTION -->
-      <div class="about-section">
-        <!-- Left Side: Text and Features -->
-        <div class="about-content">
-          <h2 class="about-title">About Us `</h2>
-          <p class="about-description">
-            We discarded passive video streams. EduVerse offers a playground
-            where theory instantly morphs into real technical actions.
-          </p>
-
-          <!-- The list of checkmarks -->
-          <div class="about-features">
-            <div class="feature-row">
-              <div class="feature-icon">✓</div>
-              <div class="feature-text">
-                <h4>Browser Integrated Sandbox</h4>
-                <p>
-                  Run and test real code environments instantly without local
-                  system software setups.
-                </p>
-              </div>
-            </div>
-
-            <div class="feature-row">
-              <div class="feature-icon">✓</div>
-              <div class="feature-text">
-                <h4>Live Cohort Check-Ins</h4>
-                <p>
-                  Sync directly with weekly mentorship circles to cross
-                  roadblocks collaboratively.
-                </p>
-              </div>
-            </div>
-
-            <div class="feature-row">
-              <div class="feature-icon">✓</div>
-              <div class="feature-text">
-                <h4>Interactive Quiz Checkpoints</h4>
-                <p>
-                  Test comprehension instantly dynamically built dynamically
-                  throughout interactive streams.
-                </p>
-              </div>
-            </div>
+      <div class="carousel-container">
+        <!-- The Slider Track -->
+        <div class="carousel-track" id="track">
+          <!-- Slide 1 -->
+          <div class="carousel-slide">
+            <!-- ⚠️ Make sure to save your actual screenshots in your public/img folder! -->
+            <img
+              src="/images/screenshot-dashboard.png"
+              alt="EduVerse Admin Dashboard"
+            />
+          </div>
+          <!-- Slide 2 -->
+          <div class="carousel-slide">
+            <img src="/images/screenshot-issue.png" alt="EduVerse Issuance Page" />
+          </div>
+          <!-- Slide 3 -->
+          <div class="carousel-slide">
+            <img
+              src="/images/screenshot-revoke.png"
+              alt="EduVerse Verification Portal"
+            />
           </div>
         </div>
 
-        <!-- Right Side: Animated Three.js cube burst (replaces the sandbox image) -->
-        <div class="about-image">
-          <div id="about-animation-container" class="sandbox-animation"></div>
+        <!-- DigiLocker-Style Controls -->
+        <div class="carousel-controls">
+          <button class="ctrl-btn" id="prevBtn" title="Previous">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+
+          <button class="ctrl-btn" id="playPauseBtn" title="Pause/Play">
+            <!-- Default is Pause icon since it auto-plays -->
+            <svg
+              id="pauseIcon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
+            </svg>
+            <svg
+              id="playIcon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style="display: none"
+            >
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+          </button>
+
+          <button class="ctrl-btn" id="nextBtn" title="Next">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
         </div>
       </div>
+    </section>
+
+    <!-- ABOUT US SECTION -->
+    <div class="about-section">
+      <div class="about-content">
+        <h2 class="about-title">About Us</h2>
+        <p class="about-description">
+          We discarded passive video streams. EduVerse offers a playground where
+          theory instantly morphs into real technical actions.
+        </p>
+
+        <div class="about-features">
+          <div class="feature-row">
+            <div class="feature-icon">✓</div>
+            <div class="feature-text">
+              <h4>Browser Integrated Sandbox</h4>
+              <p>
+                Run and test real code environments instantly without local
+                system software setups.
+              </p>
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-icon">✓</div>
+            <div class="feature-text">
+              <h4>Live Cohort Check-Ins</h4>
+              <p>
+                Sync directly with weekly mentorship circles to cross roadblocks
+                collaboratively.
+              </p>
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-icon">✓</div>
+            <div class="feature-text">
+              <h4>Interactive Quiz Checkpoints</h4>
+              <p>
+                Test comprehension instantly dynamically built dynamically
+                throughout interactive streams.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Animated Three.js cube burst -->
+      <div class="about-image">
+        <div id="about-animation-container" class="sandbox-animation"></div>
+      </div>
     </div>
+
     <!-- TESTIMONIALS SECTION -->
-    <div class="testimonials-section">
+    <section class="testimonials-section">
       <h2 class="section-title">Endorsed by Fast Growing Professionals</h2>
 
       <div class="testimonials-grid">
@@ -370,131 +494,208 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
 
-      </div> <!-- 🔴 MAKE SURE THIS IS HERE! (Closes testimonials-grid) -->
-      </section> <!-- 🔴 MAKE SURE THIS IS HERE! (Closes testimonials-section) -->
+    <!-- DARK CTA BANNER SECTION -->
+    <div class="cta-banner">
+      <div class="cta-banner-content">
+        <h2>Elevate your team today</h2>
+        <p>
+          Join thousands of organizations using the EduVerse engine to bridge
+          document verification gaps.
+        </p>
+      </div>
+      <div class="cta-banner-form">
+        <input
+          type="email"
+          placeholder="Enter your work email"
+          class="cta-input"
+        />
+        <button class="cta-subscribe-btn">Subscribe for Free Updates</button>
+      </div>
+    </div>
 
-      <!-- DARK CTA BANNER SECTION -->
-      <div class="cta-banner">
-        <div class="cta-banner-content">
-          <h2>Elevate your team today</h2>
+    <!-- FOOTER SECTION -->
+    <footer class="footer-section">
+      <div class="footer-grid">
+        <!-- Col 1: Brand Info -->
+        <div class="footer-col brand-col">
+          <div class="footer-logo">
+            <span class="logo-icon">🎓</span> EduVerse
+          </div>
           <p>
-            Join thousands of organizations using the EduVerse engine to bridge
-            document verification gaps.
+            Expanding horizons globally with next-generation interactive
+            technical education dashboards. Built by developers, for creators.
           </p>
         </div>
 
-        <div class="cta-banner-form">
-          <input type="email" placeholder="Enter your work email" class="cta-input" />
-          <button class="cta-subscribe-btn">Subscribe for Free Updates</button>
+        <!-- Col 2: Programs -->
+        <div class="footer-col">
+          <h4>PROGRAMS</h4>
+          <ul>
+            <li><a href="#">Web Dev Bootcamp</a></li>
+            <li><a href="#">Machine Learning Spec</a></li>
+            <li><a href="#">UI/UX Masterclass</a></li>
+            <li><a href="#">Database Systems</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Enterprise -->
+        <div class="footer-col">
+          <h4>ENTERPRISE</h4>
+          <ul>
+            <li><a href="#">Corporate training</a></li>
+            <li><a href="#">Interactive custom paths</a></li>
+            <li><a href="#">L&D metrics report</a></li>
+            <li><a href="#">Security audits</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Resources -->
+        <div class="footer-col">
+          <h4>RESOURCES</h4>
+          <ul>
+            <li><a href="#">Community help</a></li>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Sandbox environments</a></li>
+            <li><a href="#">System API metrics</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 5: Company -->
+        <div class="footer-col">
+          <h4>COMPANY</h4>
+          <ul>
+            <li><a href="#">About us</a></li>
+            <li><a href="#">Press room kit</a></li>
+            <li><a href="#">Global offices</a></li>
+            <li><a href="#">Careers at EduVerse</a></li>
+          </ul>
         </div>
       </div>
 
-      <!-- FOOTER SECTION -->
-      <footer class="footer-section">
-        <div class="footer-grid">
-          <!-- Col 1: Brand Info -->
-          <div class="footer-col brand-col">
-            <div class="footer-logo">
-              <span class="logo-icon">🎓</span> EduVerse
-            </div>
-            <p>
-              Expanding horizons globally with next-generation interactive
-              technical education dashboards. Built by developers, for creators.
-            </p>
-          </div>
-
-          <!-- Col 2: Programs -->
-          <div class="footer-col">
-            <h4>PROGRAMS</h4>
-            <ul>
-              <li><a href="#">Web Dev Bootcamp</a></li>
-              <li><a href="#">Machine Learning Spec</a></li>
-              <li><a href="#">UI/UX Masterclass</a></li>
-              <li><a href="#">Database Systems</a></li>
-            </ul>
-          </div>
-
-          <!-- Col 3: Enterprise -->
-          <div class="footer-col">
-            <h4>ENTERPRISE</h4>
-            <ul>
-              <li><a href="#">Corporate training</a></li>
-              <li><a href="#">Interactive custom paths</a></li>
-              <li><a href="#">L&D metrics report</a></li>
-              <li><a href="#">Security audits</a></li>
-            </ul>
-          </div>
-
-          <!-- Col 4: Resources -->
-          <div class="footer-col">
-            <h4>RESOURCES</h4>
-            <ul>
-              <li><a href="#">Community help</a></li>
-              <li><a href="#">Documentation</a></li>
-              <li><a href="#">Sandbox environments</a></li>
-              <li><a href="#">System API metrics</a></li>
-            </ul>
-          </div>
-
-          <!-- Col 5: Company -->
-          <div class="footer-col">
-            <h4>COMPANY</h4>
-            <ul>
-              <li><a href="#">About us</a></li>
-              <li><a href="#">Press room kit</a></li>
-              <li><a href="#">Global offices</a></li>
-              <li><a href="#">Careers at EduVerse</a></li>
-            </ul>
-          </div>
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bottom">
+        <p>
+          © 2026 EduVerse Interactive Technologies, Inc. All legal rights
+          secured.
+        </p>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Disclosures</a>
+          <a href="#">Cookie Management</a>
         </div>
+      </div>
+    </footer>
 
-        <!-- Footer Bottom Bar -->
-        <div class="footer-bottom">
-          <p>
-            © 2026 EduVerse Interactive Technologies, Inc. All legal rights
-            secured.
-          </p>
-          <div class="footer-bottom-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms & Disclosures</a>
-            <a href="#">Cookie Management</a>
-          </div>
-        </div>
-      </footer>
-    </div>
+    <!-- ========================================= -->
+    <!-- SCRIPTS SECTION -->
+    <!-- ========================================= -->
 
+    <!-- 1. Anime.js Text Script -->
     <script>
-      // Split the animated text into individual letter spans
       const textEl = document.getElementById("hero-animation-text");
       const originalText = textEl.textContent;
       textEl.innerHTML = originalText
         .split("")
         .map((char) => {
-          // keep spaces as spaces, wrap everything else in a span
           if (char === " ") return " ";
           return `<span class="letter">${char}</span>`;
         })
         .join("");
 
-      // Run the animation automatically on page load
       window.addEventListener("DOMContentLoaded", () => {
-        anime.timeline({ loop: false })
-          .add({
-            targets: '#hero-animation-text .letter',
-            translateY: [40, 0],
-            opacity: [0, 1],
-            easing: "easeOutExpo",
-            duration: 900,
-            delay: anime.stagger(35)
-          });
+        anime.timeline({ loop: false }).add({
+          targets: "#hero-animation-text .letter",
+          translateY: [40, 0],
+          opacity: [0, 1],
+          easing: "easeOutExpo",
+          duration: 900,
+          delay: anime.stagger(35),
+        });
       });
     </script>
 
-    <!-- Three.js cube-burst animation (replaces the About Us sandbox image) -->
-    <!-- NOTE: type="module" requires this page to be served over http/https -->
-    <!-- (e.g. via your Express server, or Railway once deployed) -->
-    <!-- Opening the file directly (file://) will NOT run this section. -->
+    <!-- 2. Carousel Auto-Slide & Controls Script -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const track = document.getElementById("track");
+        const slides = Array.from(document.querySelectorAll(".carousel-slide"));
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        const playIcon = document.getElementById("playIcon");
+        const pauseIcon = document.getElementById("pauseIcon");
+
+        let currentIndex = 0;
+        let isPlaying = true;
+        let autoSlideInterval;
+        const slideDuration = 4000; // 4 seconds per slide
+
+        // Move track
+        const updateSlidePosition = () => {
+          track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        };
+
+        const moveToNextSlide = () => {
+          currentIndex = (currentIndex + 1) % slides.length;
+          updateSlidePosition();
+        };
+
+        const moveToPrevSlide = () => {
+          currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+          updateSlidePosition();
+        };
+
+        // Auto-play control
+        const startAutoPlay = () => {
+          if (!autoSlideInterval) {
+            autoSlideInterval = setInterval(moveToNextSlide, slideDuration);
+          }
+        };
+
+        const stopAutoPlay = () => {
+          clearInterval(autoSlideInterval);
+          autoSlideInterval = null;
+        };
+
+        // Button Listeners
+        nextBtn.addEventListener("click", () => {
+          moveToNextSlide();
+          if (isPlaying) {
+            stopAutoPlay();
+            startAutoPlay();
+          }
+        });
+
+        prevBtn.addEventListener("click", () => {
+          moveToPrevSlide();
+          if (isPlaying) {
+            stopAutoPlay();
+            startAutoPlay();
+          }
+        });
+
+        playPauseBtn.addEventListener("click", () => {
+          if (isPlaying) {
+            stopAutoPlay();
+            pauseIcon.style.display = "none";
+            playIcon.style.display = "block";
+          } else {
+            startAutoPlay();
+            playIcon.style.display = "none";
+            pauseIcon.style.display = "block";
+          }
+          isPlaying = !isPlaying;
+        });
+
+        // Initialize
+        startAutoPlay();
+      });
+    </script>
+
+    <!-- 3. Three.js Cube-burst Animation -->
     <script type="module">
       import * as THREE from "https://esm.sh/three@0.166.0";
       import { animate, stagger } from "https://esm.sh/animejs@4.5.0";
@@ -506,37 +707,45 @@
         const width = container.clientWidth;
         const height = container.clientHeight;
 
-        // Basic Three.js scene setup
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(
+          50,
+          width / height,
+          0.1,
+          1000,
+        );
         camera.position.z = 30;
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          alpha: true,
+        });
         renderer.setSize(width, height);
         container.appendChild(renderer.domElement);
 
-        // Lighting so the cubes are visible
         const ambient = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambient);
         const light = new THREE.DirectionalLight(0xffffff, 1);
         light.position.set(5, 5, 5);
         scene.add(light);
 
-        // One geometry + material shared by all cube instances
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshStandardMaterial({ color: 0x21a1f1 });
 
         const count = 120;
-        const instancedMesh = new THREE.InstancedMesh(geometry, material, count);
+        const instancedMesh = new THREE.InstancedMesh(
+          geometry,
+          material,
+          count,
+        );
         scene.add(instancedMesh);
 
-        // Scatter cubes randomly around the scene (their starting position)
         const dummy = new THREE.Object3D();
         for (let i = 0; i < count; i++) {
           dummy.position.set(
             (Math.random() - 0.5) * 45,
             (Math.random() - 0.5) * 45,
-            (Math.random() - 0.5) * 45
+            (Math.random() - 0.5) * 45,
           );
           dummy.scale.setScalar(0.3);
           dummy.updateMatrix();
@@ -544,7 +753,6 @@
         }
         instancedMesh.instanceMatrix.needsUpdate = true;
 
-        // Keep rendering every frame so the animation is visible
         function renderLoop() {
           requestAnimationFrame(renderLoop);
           instancedMesh.instanceMatrix.needsUpdate = true;
@@ -552,7 +760,6 @@
         }
         renderLoop();
 
-        // Animate every cube instance flying in toward the center, on page load
         const instances = getInstances(instancedMesh);
         animate(instances, {
           x: 0,
@@ -561,10 +768,9 @@
           scale: 1,
           delay: stagger(15),
           duration: 1400,
-          easing: "easeOutExpo"
+          easing: "easeOutExpo",
         });
       }
     </script>
-</body>
-
+  </body>
 </html>

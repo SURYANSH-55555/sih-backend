@@ -110,7 +110,7 @@ header {
 }
 
 .btn-logout:hover {
-  background-color: #c82333;
+  background-color: #c92636;
 }
 
 /* Centered Content Layout Container */
@@ -343,7 +343,7 @@ select:focus {
 
 .revoked-count-badge {
   background-color: #fee2e2;
-  color: #991b1b;
+  color: #670808;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 4px 10px;
