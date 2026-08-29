@@ -28,6 +28,29 @@
       }
 
       /* ========================================= */
+      /* NEW: Category Card Image Styles           */
+      /* ========================================= */
+      .card-img {
+        width: 100%;
+        height: 200px;
+        aspect-ratio: 4/3;
+        overflow: hidden;
+        display: flex;
+        background-color: #f4f4f4;
+      }
+
+      .card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+      }
+
+      .category-card:hover .card-img img {
+        transform: scale(1.05);
+      }
+
+      /* ========================================= */
       /* NEW: EduVerse Screenshot Carousel Styles  */
       /* ========================================= */
       .carousel-section {
@@ -215,30 +238,137 @@
       </div>
     </div>
 
-    <!-- STATE CARDS SECTION -->
-    <div class="states-section">
-      <div class="state-card">
-        <h2>Bihar</h2>
-        <p>56 Colleges<br />1234 Students</p>
-      </div>
-      <div class="state-card">
-        <h2>U.P.</h2>
-        <p>39 Colleges<br />2138 Students</p>
-      </div>
-      <div class="state-card">
-        <h2>Assam</h2>
-        <p>21 Colleges<br />1234 Students</p>
-      </div>
-      <div class="state-card">
-        <h2>Gujarat</h2>
-        <p>92 Colleges<br />12324 Students</p>
+    <!-- NEO-STATES SECURE NODE SLIDER -->
+    <div class="neo-slider-wrapper">
+      <div class="neo-slider-track" id="neoTrack">
+        <!-- Card 1: Odisha -->
+        <div class="neo-card" onclick="slideNextNeo()">
+          <div class="abstract-glow glow-odisha"></div>
+          <div class="cyber-grid"></div>
+
+          <div class="neo-content">
+            <div class="live-status">
+              <div class="pulse-dot"></div>
+              Active Hub
+            </div>
+            <h3>Odisha</h3>
+            <span class="neo-tag">65+ Issuers</span>
+          </div>
+
+          <div class="neo-arrow-btn">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Rajasthan -->
+        <div class="neo-card" onclick="slideNextNeo()">
+          <div class="abstract-glow glow-rajasthan"></div>
+          <div class="cyber-grid"></div>
+
+          <div class="neo-content">
+            <div class="live-status">
+              <div class="pulse-dot"></div>
+              Active Hub
+            </div>
+            <h3>Rajasthan</h3>
+            <span class="neo-tag">125+ Issuers</span>
+          </div>
+
+          <div class="neo-arrow-btn">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Assam -->
+        <div class="neo-card" onclick="slideNextNeo()">
+          <div class="abstract-glow glow-assam"></div>
+          <div class="cyber-grid"></div>
+
+          <div class="neo-content">
+            <div class="live-status">
+              <div class="pulse-dot"></div>
+              Active Hub
+            </div>
+            <h3>Assam</h3>
+            <span class="neo-tag">50+ Issuers</span>
+          </div>
+
+          <div class="neo-arrow-btn">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Gujarat -->
+        <div class="neo-card" onclick="slideNextNeo()">
+          <div class="abstract-glow glow-gujarat"></div>
+          <div class="cyber-grid"></div>
+
+          <div class="neo-content">
+            <div class="live-status">
+              <div class="pulse-dot"></div>
+              Active Hub
+            </div>
+            <h3>Gujarat</h3>
+            <span class="neo-tag">110+ Issuers</span>
+          </div>
+
+          <div class="neo-arrow-btn">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- CATEGORY CARDS SECTION -->
+    <!-- CATEGORY CARDS SECTION (UPDATED) -->
     <div class="categories-section">
       <div class="category-card">
-        <div class="card-img" style="background-color: #2bd49e">[ Image ]</div>
+        <div class="card-img">
+          <img src="/images/academic-img.jpeg" alt="Academic Certificates" />
+        </div>
         <div class="card-content">
           <span class="badge">ACADEMIC</span>
           <h3>Academic Report Cards and Certificates</h3>
@@ -249,7 +379,9 @@
       </div>
 
       <div class="category-card">
-        <div class="card-img" style="background-color: #79a5e8">[ Image ]</div>
+        <div class="card-img">
+          <img src="/images/disciplinary-img.jpeg" alt="Disciplinary Actions" />
+        </div>
         <div class="card-content">
           <span class="badge">DISCIPLINARY ACTIONS</span>
           <h3>Any Act of Recorded Disciplinary Issues</h3>
@@ -260,7 +392,12 @@
       </div>
 
       <div class="category-card">
-        <div class="card-img" style="background-color: #fca7a9">[ Image ]</div>
+        <div class="card-img">
+          <img
+            src="/images/extracurricular-img.png"
+            alt="Extra-curricular Activities"
+          />
+        </div>
         <div class="card-content">
           <span class="badge">DESIGN</span>
           <h3>Extra-curricular Activities</h3>
@@ -800,6 +937,19 @@
           smartBackspace: false,
         });
       });
+    </script>
+
+    <script>
+      function slideNextNeo() {
+        const track = document.getElementById("neoTrack");
+        // Scrolls by one card width + the gap
+        track.scrollBy({ left: 284, behavior: "smooth" });
+
+        // Loop back to the start if they hit the end
+        if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 10) {
+          track.scrollTo({ left: 0, behavior: "smooth" });
+        }
+      }
     </script>
   </body>
 </html>

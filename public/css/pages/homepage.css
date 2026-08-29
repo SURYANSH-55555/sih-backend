@@ -252,34 +252,350 @@ h1 {
   color: #999;
 }
 
-/* --- State Cards Section --- */
+/* ========================================= */
+/* UPGRADED STATE CARDS                      */
+/* ========================================= */
 .states-section {
-  display: flex; /* Puts the 4 cards in a row */
-  gap: 20px; /* Space between each card */
-  max-width: 1300px; /* Matches the width of your hero section */
-  margin: 60px auto; /* Adds space on top/bottom, and centers the group */
-  padding: 0 50px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .state-card {
-  background: white;
-  border: 1px solid #eaeaea; /* Very light gray outline */
-  border-radius: 12px; /* Smooth rounded corners */
-  padding: 40px 30px; /* Space inside the card */
-  flex: 1; /* MAGIC TRICK: Forces all 4 cards to be exactly the same width */
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.state-card h2 {
-  color: #1a1b7f; /* Deep navy blue */
-  font-size: 36px; /* Makes the state name massive */
-  font-weight: 900; /* Extra bold */
-  margin-bottom: 20px; /* Pushes the small text down */
+/* The Hover Effect: Makes it float and highlights the border */
+.state-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(33, 161, 241, 0.1); /* Subtle brand-colored shadow */
+  border-color: #21a1f1;
+}
+
+.state-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.state-header h2 {
+  font-size: 1.8rem;
+  color: #1e1b4b; /* Keeps that deep navy blue */
+  margin: 0;
+}
+
+.state-icon {
+  font-size: 1.2rem;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.state-card:hover .state-icon {
+  opacity: 1; /* Icon brightens on hover */
+}
+
+.state-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Sleek UI Pills for the data */
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #475569;
+  font-weight: 500;
+  border: 1px solid #f1f5f9;
 }
 
 .state-card p {
   color: #777; /* Light gray */
   font-size: 13px;
   line-height: 1.6; /* Adds space between the two lines of text */
+}
+
+/* ========================================= */
+/* HORIZONTAL STATE CAROUSEL                 */
+/* ========================================= */
+.state-carousel-wrapper {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0 2rem;
+  position: relative;
+}
+
+.state-carousel-track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 10px 4px;
+
+  /* Hides the ugly scrollbar but keeps functionality */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.state-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.state-item-card {
+  flex: 0 0 240px; /* Forces cards to stay a specific width */
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.state-item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1);
+  border-color: #c7d2fe;
+}
+
+/* The Light Purple Circle from your reference */
+.state-icon-circle {
+  width: 52px;
+  height: 52px;
+  background-color: #f3f0ff; /* Very soft purple */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.state-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.state-info h3 {
+  font-size: 1.1rem;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  font-weight: 600;
+}
+
+.state-info p {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* The Bottom-Right Action Arrow */
+.state-arrow {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  font-size: 1.2rem;
+  color: #8b5cf6; /* Brand purple */
+  opacity: 0; /* Hidden by default */
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+}
+
+/* Arrow slides in and appears on hover */
+.state-item-card:hover .state-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ========================================= */
+/* PREMIUM NEO-STATES (NETWORK NODE DESIGN)  */
+/* ========================================= */
+.neo-slider-wrapper {
+  max-width: 1200px;
+  margin: 4rem auto;
+  padding: 0 2rem;
+}
+
+.neo-slider-track {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 20px 10px;
+  scrollbar-width: none;
+}
+.neo-slider-track::-webkit-scrollbar {
+  display: none;
+}
+
+.neo-card {
+  position: relative;
+  flex: 0 0 260px;
+  height: 170px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+  overflow: hidden;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+}
+
+.neo-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(33, 161, 241, 0.12);
+  border-color: #21a1f1;
+}
+
+/* 1. The Tech Grid Background */
+.cyber-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+  opacity: 0.35;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 2. The Glowing Auras */
+.abstract-glow {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  filter: blur(45px);
+  z-index: 0;
+  opacity: 0.5;
+  transition: all 0.5s ease;
+}
+.neo-card:hover .abstract-glow {
+  transform: scale(1.3);
+  opacity: 0.8;
+}
+
+/* Unique state aura colors */
+.glow-odisha {
+  background: #60a5fa;
+} /* Blue */
+.glow-rajasthan {
+  background: #f472b6;
+} /* Pink */
+.glow-assam {
+  background: #34d399;
+} /* Green */
+.glow-gujarat {
+  background: #fb923c;
+} /* Orange */
+
+.neo-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+}
+
+/* 3. The Live Node Pulsing Dot */
+.live-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* 4. Typography & Buttons */
+.neo-content h3 {
+  font-size: 1.6rem;
+  color: #0f172a;
+  margin: 0 0 16px 0;
+  font-weight: 800;
+}
+
+.neo-tag {
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.neo-arrow-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: #21a1f1;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(15px) rotate(-45deg);
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 12px rgba(33, 161, 241, 0.4);
+  z-index: 2;
+}
+
+.neo-card:hover .neo-arrow-btn {
+  opacity: 1;
+  transform: translateX(0) rotate(0deg);
 }
 
 /* --- Category Cards Section --- */
@@ -501,6 +817,7 @@ h1 {
 .testimonials-grid {
   display: flex;
   gap: 30px;
+  align-items: stretch; /* Forces all cards to stretch to the exact same height */
 }
 
 .testimonial-card {
@@ -509,7 +826,9 @@ h1 {
   border: 1px solid #eaeaea;
   border-radius: 12px;
   padding: 35px 30px;
-  text-align: left; /* Forces text inside the card back to the left */
+  text-align: left;
+  display: flex;
+  flex-direction: column; /* Turns the card into a flex column */
 }
 
 .stars {
@@ -522,9 +841,10 @@ h1 {
 .quote {
   color: #555;
   font-size: 14px;
-  font-style: italic; /* Makes the text italicized like a real quote */
+  font-style: italic;
   line-height: 1.6;
   margin-bottom: 30px;
+  /* (Remove flex-grow from here if you added it earlier) */
 }
 
 /* Author Area at the bottom of the card */
@@ -532,12 +852,15 @@ h1 {
   display: flex;
   align-items: center;
   gap: 15px;
+  margin-top: auto; /* THIS IS THE MAGIC FIX: It shoves the author block to the exact bottom of the card */
 }
 
 .avatar {
   width: 45px;
   height: 45px;
-  border-radius: 50%; /* Perfect circle for the profile picture */
+  border-radius: 50%;
+  background-color: #94a3b8 !important; /* The !important forces the color change */
+  flex-shrink: 0; /* Prevents the circle from squishing */
 }
 
 .author-info h4 {
@@ -550,6 +873,11 @@ h1 {
 .author-info p {
   font-size: 11px;
   color: #777;
+
+  /* THE ALIGNMENT FIX */
+  min-height: 32px; /* Forces every job title to take up exactly 2 lines of space */
+  line-height: 1.4; /* Keeps the text spacing clean */
+  margin-top: 2px;
 }
 
 /* --- Dark CTA Banner --- */
