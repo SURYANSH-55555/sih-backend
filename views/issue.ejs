@@ -58,6 +58,18 @@
           Revocation Registry
         </a>
       </li>
+      <li>
+        <a href="/dashboard/ledger">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"/>
+          </svg>
+          Blockchain Ledger
+        </a>
+      </li>
     </ul>
 
     <div class="header-right">
@@ -144,6 +156,16 @@
             </div>
           </div>
 
+          <!-- NEW: Document Type Dropdown -->
+          <div class="input-group" style="margin-top: 5px; margin-bottom: 20px;">
+            <label>Document Type</label>
+            <select name="docType" required>
+              <option value="Official Degree" selected>Official Degree</option>
+              <option value="Semester Marksheet">Semester Marksheet</option>
+              <option value="Bonafide Certificate">Bonafide Certificate</option>
+            </select>
+          </div>
+
           <button type="submit" class="btn-issue-submit">Issue Certificate</button>
         </form>
       </div>
@@ -170,6 +192,10 @@
             </div>
             <div class="data-row"><strong>Cert ID:</strong>
               <%= credentialData.id %>
+            </div>
+            <!-- Optionally display the newly saved docType here -->
+            <div class="data-row"><strong>Type:</strong>
+              <%= credentialData.docType || 'Official Degree' %>
             </div>
 
             <div class="hash-display">

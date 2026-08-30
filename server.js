@@ -49,6 +49,65 @@ function requireRole(role) {
 }
 
 // ==========================================
+// NEW: BLOCKCHAIN LEDGER FUNCTIONS
+// ==========================================
+
+// Function to weld a new block to the chain
+async function addBlockToLedger(certId, dataHash) {
+  const lastBlockResult = await pool.query(
+    "SELECT block_hash FROM ledger_blocks ORDER BY block_index DESC LIMIT 1",
+  );
+
+  // If it's the first certificate ever, use a genesis hash
+  const previousBlockHash =
+    lastBlockResult.rows.length > 0
+      ? lastBlockResult.rows[0].block_hash
+      : "0".repeat(64);
+
+  // Create the new Block Hash by combining the data and the previous hash
+  const blockHash = crypto
+    .createHash("sha256")
+    .update(`${certId}|${dataHash}|${previousBlockHash}`)
+    .digest("hex");
+
+  // Save the block to the ledger table
+  await pool.query(
+    `INSERT INTO ledger_blocks (cert_id, data_hash, previous_block_hash, block_hash)
+     VALUES ($1, $2, $3, $4)`,
+    [certId, dataHash, previousBlockHash, blockHash],
+  );
+
+  return blockHash;
+}
+
+// Function to scan the entire chain for broken links
+async function verifyChainIntegrity() {
+  const { rows: blocks } = await pool.query(
+    "SELECT * FROM ledger_blocks ORDER BY block_index ASC",
+  );
+
+  let expectedPrevious = "0".repeat(64);
+
+  for (const block of blocks) {
+    const recomputed = crypto
+      .createHash("sha256")
+      .update(
+        `${block.cert_id}|${block.data_hash}|${block.previous_block_hash}`,
+      )
+      .digest("hex");
+
+    if (
+      recomputed !== block.block_hash ||
+      block.previous_block_hash !== expectedPrevious
+    ) {
+      return { valid: false, brokenAtBlock: block.block_index };
+    }
+    expectedPrevious = block.block_hash;
+  }
+  return { valid: true };
+}
+
+// ==========================================
 // 2. PUBLIC & LANDING ROUTES
 // ==========================================
 app.get("/", (req, res) => {
@@ -138,9 +197,11 @@ app.post(
   ["/generate-hash", "/dashboard/issue"],
   requireRole("admin"),
   async (req, res) => {
-    const { studentName, rollNo, gradYear, degree, branch } = req.body;
+    // UPDATED: Grab docType from the request body
+    const { studentName, rollNo, gradYear, degree, branch, docType } = req.body;
 
-    const rawData = `${studentName}|${rollNo}|${degree}|${branch}|${gradYear}`;
+    // UPDATED: Include docType in the rawData string so it is cryptographically secured
+    const rawData = `${studentName}|${rollNo}|${degree}|${branch}|${gradYear}|${docType}`;
     const documentHash = crypto
       .createHash("sha256")
       .update(rawData)
@@ -149,11 +210,10 @@ app.post(
     const certificateID = `CERT-${randomHex}`;
 
     try {
-      // 1. INJECT the certificate permanently into your Postgres table
-      // Note: 'status' defaults to 'valid' via our Postgres schema update
+      // 1. INJECT the certificate permanently into your Postgres table (Added doc_type)
       await pool.query(
-        `INSERT INTO certificates (cert_id, student_name, roll_no, degree, branch, grad_year, document_hash) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        `INSERT INTO certificates (cert_id, student_name, roll_no, degree, branch, grad_year, document_hash, doc_type) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           certificateID,
           studentName,
@@ -162,14 +222,18 @@ app.post(
           branch,
           gradYear,
           documentHash,
+          docType, // NEW VARIABLE
         ],
       );
 
-      // 2. Generate Real QR Code linking to the scanner
+      // 2. NEW: WELD IT TO THE BLOCKCHAIN LEDGER
+      await addBlockToLedger(certificateID, documentHash);
+
+      // 3. Generate Real QR Code linking to the scanner
       const verificationUrl = `https://eduverse-portal.up.railway.app/dashboard/verify?id=${certificateID}`;
       const qrCodeImage = await QRCode.toDataURL(verificationUrl);
 
-      // 3. Show the Admin the successful result on the screen
+      // 4. Show the Admin the successful result on the screen
       res.render("issue", {
         activePage: "issue",
         credentialData: {
@@ -179,6 +243,7 @@ app.post(
           degree: degree,
           branch: branch,
           gradYear: gradYear,
+          docType: docType, // Pass to frontend preview
           hash: documentHash,
           qrCode: qrCodeImage,
         },
@@ -189,6 +254,24 @@ app.post(
     }
   },
 );
+
+// NEW: ADMIN LEDGER DASHBOARD ROUTE
+app.get("/dashboard/ledger", requireRole("admin"), async (req, res) => {
+  const { rows: blocks } = await pool.query(
+    "SELECT * FROM ledger_blocks ORDER BY block_index ASC",
+  );
+  const chainStatus = await verifyChainIntegrity();
+  // We explicitly remap credential_id from the ledger to cert_id for the UI
+  const mappedBlocks = blocks.map((block) => ({
+    ...block,
+    credential_id: block.cert_id,
+  }));
+  res.render("ledger", {
+    activePage: "ledger",
+    blocks: mappedBlocks,
+    chainStatus,
+  });
+});
 
 // ==========================================
 // 5. PUBLIC VERIFICATION PORTAL
@@ -216,13 +299,26 @@ app.post("/verify-action", async (req, res) => {
     }
 
     const cert = result.rows[0];
-    const rawData = `${cert.student_name}|${cert.roll_no}|${cert.degree}|${cert.branch}|${cert.grad_year}`;
+
+    // Check if the user is simulating a tamper via the UI (if you still have that feature)
+    const branchToVerify = req.body.tamperBranch || cert.branch;
+
+    // UPDATED: Include doc_type when recomputing the hash to check for tampering
+    const rawData = `${cert.student_name}|${cert.roll_no}|${cert.degree}|${branchToVerify}|${cert.grad_year}|${cert.doc_type}`;
     const recomputedHash = crypto
       .createHash("sha256")
       .update(rawData)
       .digest("hex");
 
     const isMatch = recomputedHash === cert.document_hash;
+
+    // NEW: Check if the entire blockchain is still intact!
+    const chainStatus = await verifyChainIntegrity();
+
+    // Determine overall validity
+    const isRevoked = cert.status === "revoked";
+    const isTampered = !isMatch;
+    const isValid = !isTampered && !isRevoked && chainStatus.valid;
 
     res.render("verify", {
       verifiedData: {
@@ -231,12 +327,16 @@ app.post("/verify-action", async (req, res) => {
         studentName: cert.student_name,
         rollNo: cert.roll_no,
         degree: cert.degree,
-        branch: cert.branch,
+        branch: branchToVerify,
         gradYear: cert.grad_year,
+        docType: cert.doc_type, // Expose to the verify page
         originalHash: cert.document_hash,
         recomputedHash: recomputedHash,
         isMatch: isMatch,
-        isRevoked: cert.status === "revoked", // THE NEW KILL SWITCH CHECK
+        isTampered: isTampered,
+        isRevoked: isRevoked,
+        chainValid: chainStatus.valid,
+        isValid: isValid,
         revocationReason: cert.revocation_reason,
       },
       prefillId: selectedCertId,
@@ -392,10 +492,24 @@ app.get("/student-portal", requireRole("student"), async (req, res) => {
     const fullName =
       userResult.rows.length > 0 ? userResult.rows[0].full_name : currentRollNo;
 
-    const certResult = await pool.query(
-      "SELECT * FROM certificates WHERE roll_no = $1 ORDER BY issue_date DESC",
+    // Fetch the latest Degree or Bonafide certificate
+    const latestCert = await pool.query(
+      "SELECT * FROM certificates WHERE roll_no = $1 AND doc_type != 'Semester Marksheet' ORDER BY issue_date DESC LIMIT 1",
       [currentRollNo],
     );
+
+    // Fetch the latest Semester Marksheet independently
+    const latestMarksheet = await pool.query(
+      "SELECT * FROM certificates WHERE roll_no = $1 AND doc_type = 'Semester Marksheet' ORDER BY issue_date DESC LIMIT 1",
+      [currentRollNo],
+    );
+
+    // Combine them into a single array to pass to the view
+    const displayCertificates = [];
+    if (latestCert.rows.length > 0)
+      displayCertificates.push(latestCert.rows[0]);
+    if (latestMarksheet.rows.length > 0)
+      displayCertificates.push(latestMarksheet.rows[0]);
 
     const studentData = {
       name: fullName,
@@ -406,7 +520,7 @@ app.get("/student-portal", requireRole("student"), async (req, res) => {
 
     res.render("student-portal", {
       student: studentData,
-      certificates: certResult.rows,
+      certificates: displayCertificates,
     });
   } catch (err) {
     console.error("Database error loading portal:", err);
@@ -439,32 +553,141 @@ app.get("/download/:cert_id", requireRole("student"), async (req, res) => {
     );
     doc.pipe(res);
 
+    // Outer Border
     doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).stroke();
-    doc.moveDown(2);
-    doc
-      .fontSize(35)
-      .text("National Institute of Technology", { align: "center" });
-    doc.moveDown(1);
-    doc.fontSize(20).text("Official Degree Certificate", { align: "center" });
-    doc.moveDown(2);
-    doc
-      .fontSize(16)
-      .text(`This certifies that ${cert.student_name}`, { align: "center" });
-    doc.text(`Roll Number: ${cert.roll_no}`, { align: "center" });
-    doc.moveDown(1);
-    doc.text(`Has successfully completed the requirements for the degree of`, {
-      align: "center",
-    });
-    doc
-      .fontSize(18)
-      .text(`${cert.degree} in ${cert.branch}`, { align: "center" });
-    doc.moveDown(3);
+    doc.moveDown(1.5);
 
+    // Header Title
     doc
-      .fontSize(10)
-      .fillColor("gray")
-      .text(`Document Hash: ${cert.document_hash}`, { align: "center" });
-    doc.text(`Digital Verification ID: ${cert.cert_id}`, { align: "center" });
+      .fontSize(32)
+      .text("National Institute of Technology", { align: "center" });
+    doc.moveDown(0.5);
+
+    const docTitle = cert.doc_type ? `${cert.doc_type}` : "Official Degree";
+    doc.fontSize(20).fillColor("#2563eb").text(docTitle, { align: "center" });
+    doc.fillColor("black");
+    doc.moveDown(1.5);
+
+    // CONDITIONAL LAYOUT: If it's a semester marksheet, render the grade table
+    if (cert.doc_type === "Semester Marksheet") {
+      doc.fontSize(11);
+
+      const startY = doc.y;
+
+      // Left-aligned column (X: 50)
+      doc.text(`Student Name: ${cert.student_name}`, 50, startY);
+      doc.text(`Branch: ${cert.branch}`, 50, startY + 18);
+      doc.text(`Degree: ${cert.degree}`, 50, startY + 36);
+
+      // Right-aligned column (Mirrored perfectly against the right margin at X: 50, width: 740)
+      doc.text(`Roll Number: ${cert.roll_no}`, 50, startY, {
+        align: "right",
+        width: 740,
+      });
+      doc.text(`Graduation Year: ${cert.grad_year}`, 50, startY + 18, {
+        align: "right",
+        width: 740,
+      });
+
+      doc.y = startY + 65; // Move past the header block cleanly
+
+      doc
+        .fontSize(13)
+        .text("Semester Grade Report (Demo)", { align: "center" });
+      doc.moveDown(0.8);
+
+      const tableTop = doc.y;
+      doc.rect(50, tableTop, 740, 20).fill("#f1f5f9");
+      doc.fillColor("black").fontSize(10);
+
+      doc.text("Course Code", 60, tableTop + 5, { width: 100 });
+      doc.text("Course Name", 180, tableTop + 5, { width: 280 });
+      doc.text("Credits", 480, tableTop + 5, { width: 80 });
+      doc.text("Letter Grade", 580, tableTop + 5, { width: 100 });
+      doc.text("Grade Points", 680, tableTop + 5, { width: 80 });
+
+      let rowY = tableTop + 25;
+      const subjects = [
+        {
+          code: "CH-101",
+          name: "Advanced Chemical Engineering Thermodynamics",
+          credits: 4,
+          grade: "A",
+          points: 36,
+        },
+        {
+          code: "CH-103",
+          name: "Fluid Mechanics & Particle Dynamics",
+          credits: 4,
+          grade: "EX",
+          points: 40,
+        },
+        {
+          code: "MA-201",
+          name: "Numerical Methods & Partial Differential Equations",
+          credits: 3,
+          grade: "B",
+          points: 24,
+        },
+        {
+          code: "CY-102",
+          name: "Engineering Chemistry & Polymer Science",
+          credits: 3,
+          grade: "A",
+          points: 27,
+        },
+        {
+          code: "HS-104",
+          name: "Professional Communication & Ethics",
+          credits: 2,
+          grade: "EX",
+          points: 20,
+        },
+      ];
+
+      subjects.forEach((sub) => {
+        doc.text(sub.code, 60, rowY, { width: 100 });
+        doc.text(sub.name, 180, rowY, { width: 280 });
+        doc.text(sub.credits.toString(), 480, rowY, { width: 80 });
+        doc.text(sub.grade, 580, rowY, { width: 100 });
+        doc.text(sub.points.toString(), 680, rowY, { width: 80 });
+        rowY += 20;
+      });
+
+      doc.moveDown(1.5);
+      doc
+        .fontSize(12)
+        .text("SGPA: 9.15 / 10.0", 50, doc.y + 5, { align: "right" });
+    } else {
+      // Standard Degree Layout
+      doc.moveDown(1);
+      doc
+        .fontSize(16)
+        .text(`This certifies that ${cert.student_name}`, { align: "center" });
+      doc.text(`Roll Number: ${cert.roll_no}`, { align: "center" });
+      doc.moveDown(1);
+      doc.text(
+        `Has successfully completed the requirements for the degree of`,
+        {
+          align: "center",
+        },
+      );
+      doc
+        .fontSize(18)
+        .text(`${cert.degree} in ${cert.branch}`, { align: "center" });
+      doc.moveDown(3);
+    }
+
+    // Footer Hashes and Security IDs
+    doc.fontSize(9).fillColor("gray");
+    doc.text(`Document Hash: ${cert.document_hash}`, 50, 520, {
+      align: "center",
+      width: 740,
+    });
+    doc.text(`Digital Verification ID: ${cert.cert_id}`, 50, 535, {
+      align: "center",
+      width: 740,
+    });
 
     doc.end();
   } catch (err) {

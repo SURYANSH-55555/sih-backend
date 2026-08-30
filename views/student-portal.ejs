@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Portal - Dashboard</title>
+  <!-- Include QRCode library on client side to render modal QR codes instantly -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -172,14 +174,12 @@
       font-weight: 700;
     }
 
-    /* Date & Time Card (FIXED LAYOUT) */
+    /* Date & Time Card */
     .datetime-card {
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      /* Keeps items grouped at the top */
       gap: 16px;
-      /* Tight gap between header and date */
     }
 
     .dt-header {
@@ -193,7 +193,6 @@
 
     .dt-body {
       margin-top: 0;
-      /* Removed the massive top margin */
     }
 
     .dt-date {
@@ -210,10 +209,9 @@
       font-weight: 500;
     }
 
-    /* Certificates Section (FIXED WIDTH) */
+    /* Certificates Section */
     .certs-card {
       grid-column: 1 / -1;
-      /* This forces the certificates to span the entire screen width */
     }
 
     .certs-card h2 {
@@ -321,8 +319,7 @@
       padding: 8px 14px;
       font-size: 0.75rem;
       color: #64748b;
-      font-family:
-        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       word-break: break-all;
     }
 
@@ -346,7 +343,6 @@
       gap: 6px;
       transition: background 0.15s;
       text-decoration: none;
-      /* Ensures the link tag doesn't get underline */
     }
 
     .btn-download:hover {
@@ -378,6 +374,59 @@
       color: #64748b;
       font-weight: 600;
     }
+
+    /* Modal Overlay Styles for View QR */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 16px;
+      width: 340px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .modal-card h3 {
+      font-size: 1.1rem;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-card p {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-close {
+      margin-top: 1.25rem;
+      background-color: #0f172a;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      background-color: #334155;
+    }
   </style>
 </head>
 
@@ -397,7 +446,6 @@
     <div class="header-title">Dashboard</div>
 
     <div class="header-actions">
-      <!-- Logout Button -->
       <a href="/logout" class="btn-logout" style="text-decoration: none; display: inline-block">Logout</a>
       <div class="divider"></div>
       <button class="btn-bell" aria-label="Notifications">
@@ -412,7 +460,6 @@
 
   <!-- Light Background Container -->
   <div class="container">
-    <!-- Profile & Date/Time Row -->
     <div class="top-grid">
       <div class="card profile-card">
         <div class="avatar">
@@ -459,7 +506,7 @@
         </div>
       </div>
 
-      <!-- Certificates Container (NOW DYNAMIC) -->
+      <!-- Certificates Container -->
       <div class="card certs-card">
         <h2>Certificates:</h2>
 
@@ -468,16 +515,22 @@
             <div class="cert-item">
               <div class="accent-bar"></div>
               <div class="cert-header">
-                <span class="cert-badge">DEGREE CERTIFICATE</span>
+                <!-- DYNAMIC DOCUMENT TYPE BADGE -->
+                <span class="cert-badge">
+                  <%= cert.doc_type ? cert.doc_type : 'DEGREE CERTIFICATE' %>
+                </span>
                 <span class="status-badge">
                   <span class="status-dot"></span>
                   Active / Valid
                 </span>
               </div>
 
-              <!-- Dynamic Title based on database -->
               <div class="cert-title">
-                <%= cert.degree %> in <%= cert.branch %>
+                <% if (cert.doc_type==="Semester Marksheet" ) { %>
+                  Official Semester Marksheet
+                  <% } else { %>
+                    <%= cert.degree %> in <%= cert.branch %>
+                        <% } %>
               </div>
 
               <div class="cert-meta">
@@ -489,12 +542,9 @@
               </div>
 
               <div class="cert-footer">
-                <!-- Dynamic Hash from database -->
                 <div class="hash-box">Block Hash: <%= cert.document_hash %>
                 </div>
                 <div class="actions-group">
-
-                  <!-- Dynamic Download Link triggering our PDF generator route -->
                   <a href="/download/<%= cert.cert_id %>" class="btn-download">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                       stroke-linecap="round" stroke-linejoin="round">
@@ -505,7 +555,8 @@
                     Download PDF
                   </a>
 
-                  <button class="btn-secondary">View QR</button>
+                  <!-- WORKING VIEW QR BUTTON -->
+                  <button class="btn-secondary" onclick="openQRModal('<%= cert.cert_id %>')">View QR</button>
                 </div>
               </div>
             </div>
@@ -519,42 +570,58 @@
     </div>
   </div>
 
+  <!-- QR CODE MODAL POPUP -->
+  <div id="qrModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3>Certificate QR Code</h3>
+      <p id="modalCertId" style="font-family: monospace; font-weight: bold; color: #2563eb;"></p>
+      <div id="qrcodeContainer" style="display: flex; justify-content: center; margin: 15px 0;"></div>
+      <p style="font-size: 0.75rem;">Scan with any phone camera to trigger cryptographic verification.</p>
+      <button class="modal-close" onclick="closeQRModal()">Close</button>
+    </div>
+  </div>
+
   <script>
+    // Live Clock Function
     function updateLiveClock() {
       const now = new Date();
-
-      // 1. Format the Date
-      const dateOptions = {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      };
+      const dateOptions = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
       const formattedDate = now.toLocaleDateString("en-US", dateOptions);
-
-      // 2. Format the Time with seconds
-      const timeOptions = {
-        hour: "numeric",
-        minute: "2-digit",
-        second: "2-digit",
-        timeZoneName: "short",
-      };
+      const timeOptions = { hour: "numeric", minute: "2-digit", second: "2-digit", timeZoneName: "short" };
       const formattedTime = now.toLocaleTimeString("en-US", timeOptions);
 
-      // 3. Inject them into your specific divs
       const dateElement = document.getElementById("live-date");
       const timeElement = document.getElementById("live-time");
 
       if (dateElement) dateElement.innerText = formattedDate;
-      if (timeElement)
-        timeElement.innerText = "Current Time: " + formattedTime;
+      if (timeElement) timeElement.innerText = "Current Time: " + formattedTime;
     }
 
-    // Run it once immediately so there is no lag on page load
     updateLiveClock();
-
-    // Keep it ticking every 1000 milliseconds (1 second)
     setInterval(updateLiveClock, 1000);
+
+    // QR Modal Functions
+    function openQRModal(certId) {
+      const modal = document.getElementById("qrModal");
+      const container = document.getElementById("qrcodeContainer");
+      const idText = document.getElementById("modalCertId");
+
+      container.innerHTML = ""; // Clear previous QR
+      idText.innerText = "ID: " + certId;
+
+      const verificationUrl = window.location.origin + "/dashboard/verify?id=" + certId;
+
+      QRCode.toCanvas(verificationUrl, { width: 160, margin: 1 }, function (err, canvas) {
+        if (err) console.error(err);
+        container.appendChild(canvas);
+      });
+
+      modal.style.display = "flex";
+    }
+
+    function closeQRModal() {
+      document.getElementById("qrModal").style.display = "none";
+    }
   </script>
 </body>
 
