@@ -171,8 +171,7 @@ The public routes are unauthenticated **by design**. PS-03 requires verification
 | QR-based instant verification | ✅ Implemented | `qrcode`, embedded in certificate PDFs |
 | Offline / third-party verification | ✅ Implemented | `/public-key` endpoint |
 | Auditable issuance history | ✅ Implemented | Ledger view + integrity checker |
-| Distributed multi-node consensus | ⚠️ Scoped out | See [design decisions](#design-decisions-and-honest-scope-limits) |
-| Bulk issuance / bulk verification | ❌ Not implemented | See [roadmap](#roadmap) |
+| Bulk issuance / bulk verification | ✅ Implemented | See [roadmap](#roadmap) |
 
 ---
 
